@@ -92,10 +92,12 @@ exports.login = async (req, res) => {
 
 exports.me = async (req, res) => {
     try {
-        const user = await User.findOne({ _id: req.user.id }).select("-password -__v");
+        const userId = req.user.id
+        
+        const user = await User.findById(userId).select("-password");
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ success: false, message: "User not found" });
         }
 
         res.status(200).json({ success: true, user, });
