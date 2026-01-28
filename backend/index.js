@@ -3,7 +3,9 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/auth.routes')
 const postRoutes = require('./routes/post.routes')
 const userRoutes = require('./routes/user.routes')
+const cors = require("cors");
 const app = express()
+app.use(cors());
 const port = process.env.PORT || 4000
 app.use(express.json())
 connectDB();
