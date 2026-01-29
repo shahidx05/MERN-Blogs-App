@@ -3,6 +3,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import CreatePost from './pages/CreatePost';
 import ProtectedRoute from './routes/ProtectedRoute';
 const App = () => {
 
@@ -13,6 +14,7 @@ const App = () => {
       <Route path='/login' element={<Login />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/create-post" element={<CreatePost />} />
       </Route>
 
     </Routes>

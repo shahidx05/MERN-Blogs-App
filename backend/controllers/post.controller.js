@@ -34,6 +34,39 @@ exports.getAllPosts = async (req, res) => {
     }
 }
 
+exports.getMyPosts = async (req, res) => {
+    try {
+        const {id} = req.user
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
+        const sort = req.query.sort || "latest";
+
+        const skip = (page - 1) * limit
+
+        const sortOption = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
+
+        const posts = await Post.find({author: id})
+            .populate("author", "name username profile_img")
+            .sort(sortOption)
+            .skip(skip)
+            .limit(limit)
+
+        const totalPosts = await Post.countDocuments({ author: id });
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        res.status(200).json({
+            success: true,
+            page,
+            limit,
+            totalPosts,
+            totalPages: totalPages,
+            posts
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 exports.getUserPosts = async (req, res) => {
     try {
         const { id } = req.params

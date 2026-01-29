@@ -11,7 +11,7 @@ export const getAllPosts = async () => {
 };
 
 export const register = async (name, username, email, password) => {
-const res = await fetch(`${API}/auth/register`, {
+  const res = await fetch(`${API}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -23,13 +23,69 @@ const res = await fetch(`${API}/auth/register`, {
 };
 
 export const login = async (email, password) => {
-const res = await fetch(`${API}/auth/login`, {
+  const res = await fetch(`${API}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({email, password}),
+    body: JSON.stringify({ email, password }),
   });
 
   return res.json();
 };
+
+export const getMe = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) throw new Error("Unauthorized");
+
+  return res.json();
+};
+
+export const getMyPosts = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts/my`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!res.ok) throw new Error("UnAuthorise");
+
+  return res.json();
+}
+
+export const Createpost = async (formData) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData,
+  });
+
+  return res.json();
+};
+
+export const DeletePost = async (id) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+
+  if (!res.ok) throw new Error("UnAuthorise");
+
+  return res.json();
+}

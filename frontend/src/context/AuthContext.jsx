@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { register, login } from '../services/api.js'
+import { register, login, getMe} from '../services/api.js'
 
 const AuthContext = createContext({})
 
@@ -9,11 +10,30 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || localStorage.getItem('token'))
+    const [user, setUser] = useState(null)
+
+    const fetchUserProfile = async () => {
+        try {
+            if (token) {
+                const data = await getMe()
+                setUser(data)
+            }
+        } catch (error) {
+            setUser(null)
+            Logout();
+            console.log("error", error)
+        }
+    }
+
+    useEffect(() => {
+        fetchUserProfile()
+    }, [token])
+
 
     const Register = async (name, username, email, password) => {
         await register(name, username, email, password)
     }
-    
+
     const Login = async (email, password) => {
         const data = await login(email, password)
         if (data.token) {
@@ -33,6 +53,8 @@ export const AuthProvider = ({ children }) => {
         Login,
         token,
         isLoggedIn: !!token,
+        user,
+        Logout,
     }
 
     return (
