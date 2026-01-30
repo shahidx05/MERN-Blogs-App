@@ -31,7 +31,6 @@ const CreatePost = () => {
             console.log(error);
             alert("Something went wrong");
         }
-
     }
 
     return (

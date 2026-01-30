@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import CreatePost from './pages/CreatePost';
+import EditPost from './pages/EditPost';
 import ProtectedRoute from './routes/ProtectedRoute';
 const App = () => {
 
@@ -15,6 +16,7 @@ const App = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-post" element={<CreatePost />} />
+        <Route path="/edit-post/:id" element={<EditPost />} />
       </Route>
 
     </Routes>

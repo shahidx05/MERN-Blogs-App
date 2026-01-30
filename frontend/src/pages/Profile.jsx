@@ -16,12 +16,13 @@ const Profile = () => {
     setPosts(data.posts);
   };
 
-  const deletePost = async (e, id) => {
+  const deletePost = async (id) => {
     try {
       await DeletePost(id)
+      loadPosts();
     } catch (error) {
       alert("something went wrong")
-        console.log(error)
+      console.log(error)
     }
   }
 
@@ -95,10 +96,13 @@ const Profile = () => {
 
                   <div className="flex justify-end gap-4">
                     <button className="text-blue-600 text-sm hover:underline">
-                      Edit
+                      <Link to={`/edit-post/${post._id}`} >Edit</Link>
                     </button>
                     <button className="text-red-600 text-sm hover:underline"
-                      onClick={()=>deletePost(post._id)}
+                      onClick={() => {
+                        deletePost(post._id)
+                      }
+                      }
                     >
                       Delete
                     </button>
