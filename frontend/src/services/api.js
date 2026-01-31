@@ -103,9 +103,9 @@ export const DeletePost = async (id) => {
   return res.json();
 }
 
-export const Editpost = async (formData) => {
+export const Editpost = async (formData, id) => {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API}/posts`, {
+  const res = await fetch(`${API}/posts/${id}`, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${token}`
