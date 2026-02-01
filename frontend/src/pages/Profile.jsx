@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getMyPosts, DeletePost } from "../services/api";
+import { getMyPosts, DeletePost, Editprofile } from "../services/api";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, fetchUserProfile , setUser} = useAuth();
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -26,7 +26,39 @@ const Profile = () => {
     }
   }
 
-  if (!user) return <p className="text-center mt-10">Loading...</p>;
+  const handleAvatarChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const previewUrl = URL.createObjectURL(file);
+      setUser(prev => ({
+        ...prev,
+        profile_img: previewUrl,
+      }));
+
+      const formData = new FormData();
+      formData.append("profile_img", file);
+
+      const data = await Editprofile(formData);
+
+      if (!data.success) {
+        alert(data.message || "Avatar update failed");
+        return;
+      }
+
+      await fetchUserProfile();
+
+    } catch (error) {
+      console.log(error);
+      alert("something went  m wrong");
+    }
+  };
+
+  if (!user) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -39,19 +71,26 @@ const Profile = () => {
         {/* Profile Card */}
         <div className="bg-white rounded shadow p-6 flex flex-col items-center">
           <img
-            src={user.user.profile_img}
+            src={user.profile_img}
             alt="Avatar"
             className="w-32 h-32 rounded-full object-cover border mb-4"
           />
 
-          <button className="text-sm text-blue-600 hover:underline mb-4">
+          <label className="text-sm text-blue-600 hover:underline mb-4 cursor-pointer">
             Change Avatar
-          </button>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleAvatarChange}
+            />
+          </label>
+
 
           <div className="text-center space-y-1">
-            <h2 className="text-lg font-semibold">{user.user.name}</h2>
-            <p className="text-gray-600">@{user.user.username}</p>
-            <p className="text-gray-500 text-sm">{user.user.email}</p>
+            <h2 className="text-lg font-semibold">{user.name}</h2>
+            <p className="text-gray-600">@{user.username}</p>
+            <p className="text-gray-500 text-sm">{user.email}</p>
           </div>
         </div>
 

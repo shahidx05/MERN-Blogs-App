@@ -115,3 +115,16 @@ export const Editpost = async (formData, id) => {
 
   return res.json();
 };
+
+export const Editprofile = async (formData) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/users/profile`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData,
+  });
+
+  return res.json();
+};

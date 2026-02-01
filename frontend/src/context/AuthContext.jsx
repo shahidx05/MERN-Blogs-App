@@ -16,12 +16,13 @@ export const AuthProvider = ({ children }) => {
         try {
             if (token) {
                 const data = await getMe()
-                setUser(data)
+                setUser(data.user)
             }
         } catch (error) {
-            setUser(null)
-            Logout();
-            console.log("error", error)
+             console.log("fetchUserProfile error:", error);
+            // setUser(null)
+            // Logout();
+            // console.log("error", error)
         }
     }
 
@@ -53,7 +54,9 @@ export const AuthProvider = ({ children }) => {
         Login,
         token,
         isLoggedIn: !!token,
+        fetchUserProfile,
         user,
+        setUser,
         Logout,
     }
 
