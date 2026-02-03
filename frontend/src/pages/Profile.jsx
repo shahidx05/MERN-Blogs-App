@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { getMyPosts, DeletePost, Editprofile } from "../services/api";
 
 const Profile = () => {
-  const { user, fetchUserProfile , setUser} = useAuth();
+  const { user, fetchUserProfile, setUser } = useAuth();
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {

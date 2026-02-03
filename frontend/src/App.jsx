@@ -7,6 +7,7 @@ import CreatePost from './pages/CreatePost';
 import EditPost from './pages/EditPost';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Navbar from "./components/Navbar";
+import PostDetails from './pages/PostDetails';
 const App = () => {
 
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/post/:id' element={<PostDetails/>} />
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-post" element={<CreatePost />} />

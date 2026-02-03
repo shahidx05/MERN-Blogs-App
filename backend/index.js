@@ -5,8 +5,13 @@ const postRoutes = require('./routes/post.routes')
 const userRoutes = require('./routes/user.routes')
 const cors = require("cors");
 const app = express()
-app.use(cors());
 const port = process.env.PORT || 4000
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
+
 app.use(express.json())
 connectDB();
 

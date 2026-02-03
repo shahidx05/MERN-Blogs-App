@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllPosts } from "../services/api";
+import { Link } from "react-router";
 
 const Home = () => {
   const [posts, setPosts] = useState([])
@@ -7,10 +8,10 @@ const Home = () => {
   const loadPosts = async () => {
     try {
       const data = await getAllPosts()
-      if(data){
+      if (data) {
         setPosts(data.posts)
       }
-   } catch (error) {
+    } catch (error) {
       console.log(error)
     }
   }
@@ -20,11 +21,11 @@ const Home = () => {
   }, [])
 
   const formatDate = (date) =>
-  new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+    new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -75,7 +76,9 @@ const Home = () => {
 
               {/* Read More */}
               <button className="text-blue-600 font-medium hover:underline">
-                Read more →
+                <Link to={`/post/${post._id}`}>
+                  Read more →
+                </Link>
               </button>
             </div>
           </div>
