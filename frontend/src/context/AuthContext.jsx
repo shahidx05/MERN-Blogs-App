@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { register, login, getMe} from '../services/api.js'
+import { register, login, getMe } from '../services/api.js'
 
 const AuthContext = createContext({})
 
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(data.user)
             }
         } catch (error) {
-             console.log("fetchUserProfile error:", error);
+            console.log("fetchUserProfile error:", error);
             // setUser(null)
             // Logout();
             // console.log("error", error)
@@ -32,7 +32,16 @@ export const AuthProvider = ({ children }) => {
 
 
     const Register = async (name, username, email, password) => {
-        await register(name, username, email, password)
+        try {
+            const data = await register(name, username, email, password)
+            if (data.token) {
+                localStorage.setItem("token", data.token);
+                setToken(data.token);
+            }
+            return data
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const Login = async (email, password) => {

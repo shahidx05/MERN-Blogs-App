@@ -74,7 +74,7 @@ const Login = () => {
                 <p className="text-sm text-center mt-4">
                     Don’t have an account?{" "}
                     <span className="text-blue-600 cursor-pointer">
-                        <Link to="/" >Register</Link>
+                        <Link to="/register" >Register</Link>
                     </span>
                 </p>
             </div>

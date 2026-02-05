@@ -1,19 +1,29 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate()
 
-  const {Register} = useAuth()
+  const { Register } = useAuth()
 
-  const submitHandler = (e)=>{
-    e.preventDefault()
-    Register(name, username, email, password)
-  }
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await Register(name, username, email, password);
+
+      if (res.token) {
+        navigate("/profile");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -22,7 +32,7 @@ const Register = () => {
           Register
         </h2>
 
-        <form className="space-y-4">
+        <form className="space-y-4"  onSubmit={submitHandler}>
           <div>
             <label className="block text-sm font-medium mb-1">
               Name
@@ -32,19 +42,19 @@ const Register = () => {
               placeholder="Your name"
               className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
               value={name}
-              onChange={(e)=>setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
-              Name
+              Userame
             </label>
             <input
               type="text"
-                placeholder="Your username"
+              placeholder="Your username"
               className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
               value={username}
-              onChange={(e)=>setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
@@ -57,7 +67,7 @@ const Register = () => {
               placeholder="Your email"
               className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
               value={email}
-              onChange={(e)=>setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -70,14 +80,13 @@ const Register = () => {
               placeholder="Create password"
               className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
               value={password}
-            onChange={(e)=>setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
-            onClick={(e)=>submitHandler(e)}
           >
             Register
           </button>
