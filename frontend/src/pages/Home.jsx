@@ -62,8 +62,10 @@ const Home = () => {
                   alt="Author"
                   className="w-8 h-8 rounded-full object-cover"
                 />
-                <span className="font-medium text-gray-700">
-                  {post.author.name}
+                <span className="font-medium text-gray-700 hover:text-blue-700">
+                  <Link to={`/user/${post.author.username}`} >
+                  {post.author.username}
+                  </Link>
                 </span>
                 <span>•</span>
                 <span>{formatDate(post.createdAt)}</span>

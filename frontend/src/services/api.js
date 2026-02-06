@@ -128,3 +128,29 @@ export const Editprofile = async (formData) => {
 
   return res.json();
 };
+
+export const getUser = async (username) => {
+  const res = await fetch(`${API}/users/${username}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+}
+
+export const getUserPosts = async (id) => {
+  const res = await fetch(`${API}/posts/user/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+}

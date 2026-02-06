@@ -3,14 +3,14 @@ const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 exports.getUserProfile = async (req, res) => {
     try {
-        const { id } = req.params
-        const user = await User.findById(id).select("-password -__v -email");
+        const { username } = req.params
+        const user = await User.findOne({username}).select("-password -__v -email");
 
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        res.status(200).json({ success: true, user, });
+        res.status(200).json({ success: true, user});
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
