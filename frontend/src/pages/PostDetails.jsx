@@ -9,7 +9,6 @@ const PostDetails = () => {
         try {
             const data = await getPost(id)
             setPost(data.post)
-            console.log(data)
         } catch (error) {
             console.log(error)
         }
