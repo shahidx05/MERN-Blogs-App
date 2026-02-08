@@ -154,3 +154,16 @@ export const getUserPosts = async (id) => {
 
   return res.json();
 }
+
+export const ToggleLike = async (id) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts/like/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+};
