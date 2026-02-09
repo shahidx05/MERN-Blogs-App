@@ -26,7 +26,6 @@ const CreatePost = () => {
             } else {
                 alert(data.message || "Failed to create post");
             }
-            navigate('/profile')
         } catch (error) {
             console.log(error);
             alert("Something went wrong");

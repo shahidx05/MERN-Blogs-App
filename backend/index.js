@@ -3,6 +3,7 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/auth.routes')
 const postRoutes = require('./routes/post.routes')
 const userRoutes = require('./routes/user.routes')
+const commentRoutes = require('./routes/comment.routes')
 const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 4000
@@ -18,6 +19,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/comments", commentRoutes);
 
 app.get('/', (req, res) => {
   res.send('Welcome to Blogs API')
