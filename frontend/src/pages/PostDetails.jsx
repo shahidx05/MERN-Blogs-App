@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getPost } from "../services/api";
+import { getPost, ToggleLike } from "../services/api";
+import { Heart, Share2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 const PostDetails = () => {
+    const { user } = useAuth()
     const { id } = useParams()
     const [post, setPost] = useState(null)
+
     const loadPost = async () => {
         try {
             const data = await getPost(id)
@@ -13,6 +17,16 @@ const PostDetails = () => {
             console.log(error)
         }
     }
+
+    const toggleLike = async () => {
+        try {
+            await ToggleLike(id)
+            loadPost()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         loadPost()
     }, [])
@@ -20,6 +34,8 @@ const PostDetails = () => {
     if (!post) {
         return <p className="text-center mt-10">Loading post...</p>;
     }
+
+    const isLiked = post.likes?.includes(user?._id);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -83,21 +99,46 @@ const PostDetails = () => {
                 </div>
 
                 {/* Actions (optional) */}
-                <div className="flex justify-between items-center">
-                    <button className="text-blue-600 hover:underline">
-                        <Link to='/'>
-                            ← Back to Home
-                        </Link>
-                    </button>
+                <div className="flex justify-between items-center bg-white rounded shadow p-4">
 
-                    <div className="flex gap-4">
-                        <button className="text-gray-600 hover:text-black">
-                            Like
+                    <Link
+                        to="/"
+                        className="text-blue-600 hover:underline"
+                    >
+                        ← Back to Home
+                    </Link>
+
+                    {/* Like & Share UI */}
+                    <div className="flex items-center gap-6">
+
+                        {/* Like */}
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={toggleLike}
+                                className={`transition ${isLiked
+                                    ? "text-red-500"
+                                    : "text-gray-600 hover:text-red-500"
+                                    }`}
+                            >
+                                <Heart className="w-5 h-5"
+                                    fill={isLiked ? "currentColor" : "none"}
+                                />
+                            </button>
+                            <span className="text-sm font-medium">
+                                {post.likes.length} Likes
+                            </span>
+                        </div>
+
+                        {/* Share */}
+                        <button className="flex items-center gap-2 text-gray-600 hover:text-black transition">
+                            <Share2 className="w-5 h-5" />
+                            <span className="text-sm font-medium">
+                                Share
+                            </span>
                         </button>
-                        <button className="text-gray-600 hover:text-black">
-                            Share
-                        </button>
+
                     </div>
+
                 </div>
             </div>
         </div>
