@@ -167,3 +167,30 @@ export const ToggleLike = async (id) => {
 
   return res.json();
 };
+
+export const getPostComments = async (id) => {
+  const res = await fetch(`${API}/comments/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+}
+
+export const CreateComment = async (id, content) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/comments/${id}`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({content}),
+  });
+
+  return res.json();
+};
