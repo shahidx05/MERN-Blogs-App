@@ -7,20 +7,29 @@ import { useAuth } from "../context/AuthContext";
 const Home = () => {
   const { user } = useAuth()
   const [posts, setPosts] = useState([])
-
-  const loadPosts = async () => {
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const loadPosts = async (pageNumber = 1) => {
     try {
-      const data = await getAllPosts()
+      setLoading(true);
+      const data = await getAllPosts(pageNumber, 10)
+
       if (data) {
-        setPosts(data.posts)
+        setPosts((prev) => [...prev, ...data.posts])
+        setTotalPages(data.totalPages)
+        setPage(pageNumber);
       }
     } catch (error) {
       console.log(error)
     }
+    finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
-    loadPosts()
+    loadPosts(1)
   }, [])
 
   const toggleLike = async (id) => {
@@ -102,8 +111,8 @@ const Home = () => {
                         }`}
                     >
                       <Heart className="w-5 h-5"
-                      fill={isLiked ? "currentColor" : "none"}
-                       />
+                        fill={isLiked ? "currentColor" : "none"}
+                      />
                     </button>
                     <span className="text-sm font-medium">
                       {post.likes.length} Likes
@@ -122,6 +131,20 @@ const Home = () => {
             </div>
           )
         })}
+        {page < totalPages && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => loadPosts(page + 1)}
+              disabled={loading}
+              className="px-6 py-2 border border-gray-400 text-gray-700 
+                 rounded-md hover:bg-gray-100 transition
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Loading..." : "Load More"}
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

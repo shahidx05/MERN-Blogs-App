@@ -13,6 +13,8 @@ const PostDetails = () => {
     const [content, setContent] = useState('')
     const [myComment, setMycomment] = useState(false)
     const [sortType, setSortType] = useState("latest");
+    const [visibleCount, setVisibleCount] = useState(5);
+
 
     const loadPost = async () => {
         try {
@@ -37,6 +39,7 @@ const PostDetails = () => {
             const res = await getPostComments(id)
             if (res) {
                 setComments(res.comments)
+                // setVisibleCount(5);
             }
         } catch (error) {
             console.log(error)
@@ -277,7 +280,7 @@ const PostDetails = () => {
 
                     {/* Comments List */}
                     <div className="space-y-4">
-                        {filteredComments.map((c) => (
+                        {filteredComments.slice(0, visibleCount).map((c) => (
                             <div key={c._id} className="flex gap-3">
                                 {c.author.profile_img && (
                                     <img
@@ -316,8 +319,18 @@ const PostDetails = () => {
                                 </div>
                             </div>
                         ))}
-
                     </div>
+
+                    {filteredComments.length > visibleCount && (
+                        <div className="flex justify-center mt-4">
+                            <button
+                                onClick={() => setVisibleCount(prev => prev + 5)}
+                                className="px-4 py-2 text-sm border rounded-md bg-white text-gray-700 shadow-sm hover:bg-gray-100"
+                            >
+                                Load more comments
+                            </button>
+                        </div>
+                    )}
 
                     {comments.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-10 text-gray-500">

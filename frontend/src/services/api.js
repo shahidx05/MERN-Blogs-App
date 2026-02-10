@@ -38,8 +38,8 @@ export const getMe = async () => {
   return res.json();
 };
 
-export const getAllPosts = async () => {
-  const res = await fetch(`${API}/posts`);
+export const getAllPosts = async (page=1, limit=10) => {
+  const res = await fetch(`${API}/posts?page=${page}&limit=${limit}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch posts");
