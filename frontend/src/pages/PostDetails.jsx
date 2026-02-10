@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getPost, ToggleLike, getPostComments, CreateComment } from "../services/api";
+import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment } from "../services/api";
 import { Heart, Share2, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -48,6 +48,16 @@ const PostDetails = () => {
                 loadComments()
                 setContent('')
             }
+        } catch (error) {
+            alert("something went wrong")
+            console.log(error)
+        }
+    }
+
+    const handleDeleteComment = async (commentId) => {
+        try {
+            await DeleteComment(commentId)
+            loadComments()
         } catch (error) {
             alert("something went wrong")
             console.log(error)
@@ -229,6 +239,15 @@ const PostDetails = () => {
                                             <span className="text-xs text-gray-500">
                                                 {formatDate(c.createdAt)}
                                             </span>
+                                            {user && (user._id === c.author._id || user._id === post.author._id) &&
+                                                <button
+                                                    onClick={() => handleDeleteComment(c._id)}
+                                                    className="text-gray-400 hover:text-red-600 transition p-1 rounded-full hover:bg-red-50"
+                                                    title="Delete comment"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            }
                                         </div>
                                     </div>
 

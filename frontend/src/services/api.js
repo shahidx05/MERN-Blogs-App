@@ -194,3 +194,17 @@ export const CreateComment = async (id, content) => {
 
   return res.json();
 };
+
+export const DeleteComment = async (id) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/comments/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  });
+
+  if (!res.ok) throw new Error("UnAuthorise");
+
+  return res.json();
+}
