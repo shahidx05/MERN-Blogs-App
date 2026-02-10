@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment } from "../services/api";
-import { Heart, Share2, Trash2 } from "lucide-react";
+import { Heart, Share2, Trash2, MessageCircle, CaseLower } from "lucide-react";
+
 import { useAuth } from "../context/AuthContext";
 
 const PostDetails = () => {
@@ -10,6 +11,8 @@ const PostDetails = () => {
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
     const [content, setContent] = useState('')
+    const [myComment, setMycomment] = useState(false)
+    const [sortType, setSortType] = useState("latest");
 
     const loadPost = async () => {
         try {
@@ -64,6 +67,10 @@ const PostDetails = () => {
         }
     }
 
+    const handleMyComment = () => {
+        setMycomment((prev) => !prev)
+    }
+
     useEffect(() => {
         loadPost()
         loadComments()
@@ -75,6 +82,18 @@ const PostDetails = () => {
             day: "numeric",
             year: "numeric",
         });
+
+    let filteredComments = [...comments]
+
+    filteredComments = myComment
+        ? filteredComments.filter(c => c.author._id === user?._id)
+        : filteredComments;
+
+    if (sortType === "latest") {
+        filteredComments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+        filteredComments.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    }
 
     if (!post) {
         return <p className="text-center mt-10">Loading post...</p>;
@@ -188,7 +207,46 @@ const PostDetails = () => {
                 {/* Comments Section */}
                 <div className="bg-white rounded shadow p-6 space-y-6">
 
-                    <h2 className="text-xl font-semibold">Comments</h2>
+                    {/* Comments Header */}
+                    <div className="flex items-center justify-between">
+
+                        {/* Left: Count */}
+                        <h2 className="text-xl font-semibold">
+                            Comments ({filteredComments.length})
+                        </h2>
+
+                        {/* Right: Controls */}
+                        <div className="flex items-center gap-3">
+
+                            {/* My Comments Toggle (UI only) */}
+                            <button
+                                className={`text-sm px-3 py-1 rounded border transition ${myComment
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "bg-white text-gray-700 hover:bg-gray-100"
+                                    }`}
+                                onClick={handleMyComment}
+                            >
+                                My Comments
+                            </button>
+
+
+                            {/* Sort Dropdown (UI only) */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500">Sort:</span>
+                                <select
+                                    className="text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    value={sortType}
+                                    onChange={(e) => setSortType(e.target.value)}
+                                >
+                                    <option value="latest">Latest</option>
+                                    <option value="oldest">Oldest</option>
+                                </select>
+                            </div>
+
+
+                        </div>
+                    </div>
+
 
                     {/* Add Comment */}
                     <div className="flex gap-3">
@@ -219,7 +277,7 @@ const PostDetails = () => {
 
                     {/* Comments List */}
                     <div className="space-y-4">
-                        {comments.map((c) => (
+                        {filteredComments.map((c) => (
                             <div key={c._id} className="flex gap-3">
                                 {c.author.profile_img && (
                                     <img
@@ -229,7 +287,8 @@ const PostDetails = () => {
                                     />
                                 )}
 
-                                <div className="bg-gray-100 rounded-lg p-3 flex-1">
+                                <div className={`rounded-lg p-3 flex-1 ${c.author._id === user._id ? "bg-blue-50 border border-blue-200" : "bg-gray-100 "}`}
+                                >
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="font-semibold text-sm text-gray-900">
                                             {c.author.username}
@@ -259,6 +318,14 @@ const PostDetails = () => {
                         ))}
 
                     </div>
+
+                    {comments.length === 0 && (
+                        <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+                            <MessageCircle className="w-8 h-8 mb-2" />
+                            <p className="text-sm">No comments yet</p>
+                            <p className="text-xs mt-1">Be the first to comment</p>
+                        </div>
+                    )}
 
                 </div>
 
