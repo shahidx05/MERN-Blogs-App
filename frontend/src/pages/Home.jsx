@@ -174,6 +174,10 @@ const Home = () => {
             </button>
           </div>
         )}
+        {posts.length === 0 && !loading && (
+          <p className="text-center text-gray-500">No posts found</p>
+        )}
+
 
       </div>
     </div>

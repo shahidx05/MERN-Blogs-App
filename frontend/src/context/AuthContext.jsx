@@ -19,10 +19,9 @@ export const AuthProvider = ({ children }) => {
                 setUser(data.user)
             }
         } catch (error) {
+            setUser(null)
+            Logout();
             console.log("fetchUserProfile error:", error);
-            // setUser(null)
-            // Logout();
-            // console.log("error", error)
         }
     }
 
