@@ -10,6 +10,7 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+
   const loadPosts = async (pageNumber = 1) => {
     try {
       setLoading(true);
@@ -33,9 +34,22 @@ const Home = () => {
   }, [])
 
   const toggleLike = async (id) => {
+    setPosts(prev =>
+      prev.map(post => {
+        if (post._id === id) {
+          const hasLiked = post.likes.includes(user?._id)
+          const updatedLikes = hasLiked
+            ? post.likes.filter((userId) => userId !== user?._id)
+            : [...post.likes, user?._id];
+          return { ...post, likes: updatedLikes };
+        }
+        return post
+      }
+      )
+    );
+
     try {
       await ToggleLike(id)
-      loadPosts()
     } catch (error) {
       console.log(error)
     }
