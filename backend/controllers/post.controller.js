@@ -2,23 +2,34 @@ const Post = require('../models/Post')
 const mongoose = require('mongoose')
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
-exports.getAllPosts = async (req, res) => {
+exports.getPosts = async (req, res) => {
     try {
+        const { q = "" } = req.query
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
         const sort = req.query.sort || "latest";
 
         const skip = (page - 1) * limit
-
         const sortOption = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
 
-        const posts = await Post.find()
+        let filter = {};
+
+        if (q.trim() !== "") {
+            filter = {
+                $or: [
+                    { title: { $regex: q, $options: "i" } },
+                    { content: { $regex: q, $options: "i" } }
+                ]
+            };
+        }
+
+        const posts = await Post.find(filter)
             .populate("author", "name username profile_img")
             .sort(sortOption)
             .skip(skip)
             .limit(limit)
 
-        const totalPosts = await Post.countDocuments();
+        const totalPosts = await Post.countDocuments(filter);
         const totalPages = Math.ceil(totalPosts / limit);
 
         res.status(200).json({

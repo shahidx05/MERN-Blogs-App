@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllPosts, ToggleLike } from "../services/api";
 import { Link } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
@@ -10,11 +10,12 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [q, setq] = useState("");
 
   const loadPosts = async (pageNumber = 1) => {
     try {
       setLoading(true);
-      const data = await getAllPosts(pageNumber, 10)
+      const data = await getAllPosts(pageNumber, 10, q)
 
       if (data) {
         setPosts((prev) => [...prev, ...data.posts])
@@ -30,8 +31,10 @@ const Home = () => {
   }
 
   useEffect(() => {
-    loadPosts(1)
-  }, [])
+    setPosts([]);     // clear old posts
+    setPage(1);       // reset page
+    loadPosts(1);
+  }, [q])
 
   const toggleLike = async (id) => {
     setPosts(prev =>
@@ -67,8 +70,21 @@ const Home = () => {
       {/* Page Container */}
       <div className="max-w-5xl mx-auto p-4 space-y-6">
 
-        {/* Page Title */}
-        <h1 className="text-2xl font-semibold">Latest Posts</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold">Latest Posts</h1>
+
+          {/* Search Bar UI Only */}
+          <div className="relative w-full sm:w-80 shadow-sm rounded-lg">
+            <input
+              type="text"
+              placeholder="Search articles..."
+              className="w-full bg-white border border-gray-300 rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-black transition"
+              value={q}
+              onChange={e => setq(e.target.value)}
+            />
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+          </div>
+        </div>
 
         {/* Posts */}
         {posts.map((post) => {

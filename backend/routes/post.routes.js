@@ -4,7 +4,7 @@ const authMiddleware = require('../middleware/auth.middleware')
 const postController = require('../controllers/post.controller')
 const upload = require("../middleware/upload.middleware");
 
-router.get('/', postController.getAllPosts)
+router.get('/', postController.getPosts)
 router.get('/my',authMiddleware, postController.getMyPosts)
 router.get('/user/:id', postController.getUserPosts)
 router.get('/:id', postController.getPost)
