@@ -7,7 +7,8 @@ const EditPost = () => {
     const navigate = useNavigate()
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
-    const [img, setImg] = useState(null);
+    const [img, setImg] = useState("");
+    const [file, setFile] = useState(null)
 
     const getPostData = async () => {
         try {
@@ -24,6 +25,14 @@ const EditPost = () => {
         }
     }
 
+    const handleImageChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setImg(URL.createObjectURL(selectedFile));
+        }
+    }
+
     const editBtnHandler = async () => {
         if (!title || !content) {
             alert("Title and content are required");
@@ -33,7 +42,7 @@ const EditPost = () => {
             const formData = new FormData();
             formData.append("title", title);
             formData.append("content", content);
-            if (img) formData.append("img", img);
+            if (file) formData.append("img", file);
 
             const data = await Editpost(formData, id)
             if (data.success) {
@@ -120,7 +129,7 @@ const EditPost = () => {
                         <input
                             type="file"
                             className="w-full"
-                            onChange={(e) => setImg(e.target.files[0])}
+                            onChange={handleImageChange}
                         />
                     </div>
 
