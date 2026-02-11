@@ -82,3 +82,45 @@ exports.delete = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+
+
+// exports.getComments = async (req, res) => {
+//     try {
+//         const { postId } = req.params
+
+//         if (!mongoose.Types.ObjectId.isValid(postId)) {
+//             return res.status(400).json({ message: "Invalid post id" });
+//         }
+
+//         const page = Math.max(1, parseInt(req.query.page) || 1);
+//         const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
+//         const sort = req.query.sort || "latest";
+
+//         const skip = (page - 1) * limit
+//         const sortOption = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
+
+//         const comments = await Comment.find({ post: postId })
+//             .populate("author", "username profile_img")
+//             .sort(sortOption)
+//             .skip(skip)
+//             .limit(limit)
+
+//         const totalComments = await Comment.countDocuments({ post: postId });
+//         const totalPages = Math.ceil(totalComments / limit);
+//         const hasMore = page < totalPages;
+
+//         res.status(200).json({
+//             success: true,
+//             page,
+//             limit,
+//             totalComments,
+//             totalPages: totalPages,
+//             hasMore,
+//             comments
+//         })
+
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: error.message });
+//     }
+// }

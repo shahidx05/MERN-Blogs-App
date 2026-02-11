@@ -87,6 +87,13 @@ const Profile = () => {
             <p className="text-gray-600">@{user.username}</p>
             <p className="text-gray-500 text-sm">{user.email}</p>
           </div>
+          <Link
+            to="/edit-profile"
+            className="mt-4 px-4 py-2 text-sm border rounded-md bg-white text-gray-700 hover:bg-gray-100"
+          >
+            Edit Profile
+          </Link>
+
         </div>
 
         {/* Create Post Button */}

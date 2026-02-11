@@ -9,6 +9,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import Navbar from "./components/Navbar";
 import PostDetails from './pages/PostDetails';
 import PublicProfile from './pages/PublicProfile';
+import EditProfile from './pages/EditProfile';
 const App = () => {
 
   return (
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/edit-post/:id" element={<EditPost />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
       </Routes>
     </>
