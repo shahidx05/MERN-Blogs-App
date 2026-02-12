@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { getAllPosts, ToggleLike } from "../services/api";
+import { getAllPosts, ToggleLike, ToggleBookmark } from "../services/api";
 import { Link } from "react-router-dom";
-import { Heart, Search } from "lucide-react";
+import { Heart, Search, Bookmark } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const Home = () => {
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   const [posts, setPosts] = useState([])
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -58,6 +58,17 @@ const Home = () => {
     }
   }
 
+  const toggleSave = async (id) => {
+    try {
+      const res = await ToggleBookmark(id);
+      if (res.success) {
+        setUser({ ...user, bookmarks: res.bookmarks });
+      }
+    } catch (error) {
+      console.log("Error bookmarking post:", error);
+    }
+  }
+
   const formatDate = (date) =>
     new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -89,6 +100,7 @@ const Home = () => {
         {/* Posts */}
         {posts.map((post) => {
           const isLiked = post.likes?.includes(user?._id);
+          const isBookmark = user?.bookmarks?.includes(post._id)
           return (
             <div
               key={post._id}
@@ -131,23 +143,40 @@ const Home = () => {
 
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-2">
-                  {/* Like UI */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-5">
+
+                    {/* Like UI */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleLike(post._id)}
+                        className={`transition ${isLiked
+                          ? "text-red-500"
+                          : "text-gray-600 hover:text-red-500"
+                          }`}
+                      >
+                        <Heart className="w-5 h-5"
+                          fill={isLiked ? "currentColor" : "none"}
+                        />
+                      </button>
+                      <span className="text-sm font-medium">
+                        {post.likes.length} Likes
+                      </span>
+                    </div>
                     <button
-                      onClick={() => toggleLike(post._id)}
-                      className={`transition ${isLiked
-                        ? "text-red-500"
-                        : "text-gray-600 hover:text-red-500"
+                      onClick={() => toggleSave(post._id)}
+                      className={`transition ${isBookmark
+                        ? "text-blue-600"
+                        : "text-gray-600 hover:text-blue-600"
                         }`}
+                      title="Save post"
                     >
-                      <Heart className="w-5 h-5"
-                        fill={isLiked ? "currentColor" : "none"}
+                      <Bookmark
+                        className="w-5 h-5"
+                        fill={isBookmark ? "currentColor" : "none"}
                       />
                     </button>
-                    <span className="text-sm font-medium">
-                      {post.likes.length} Likes
-                    </span>
                   </div>
+
 
                   {/* Read More */}
                   <Link

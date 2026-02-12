@@ -208,3 +208,16 @@ export const DeleteComment = async (id) => {
 
   return res.json();
 }
+
+export const ToggleBookmark = async (id) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/users/bookmarks/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+};
