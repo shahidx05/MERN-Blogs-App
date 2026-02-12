@@ -52,3 +52,57 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+exports.bookmark = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid post id" });
+        }
+
+        const user = await User.findById(req.user.id)
+
+        if (user.bookmarks.includes(id)) {
+            user.bookmarks.pull(id)
+        }
+        else {
+            user.bookmarks.push(id)
+        }
+
+        await user.save()
+
+        res.status(200).json({
+            success: true,
+            message: "Bookmark added successfully",
+            bookmarks: user.bookmarks
+        })
+
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+exports.getUserBookmarks = async (req, res) => {
+    try {
+        const { username } = req.params
+        const user = await User.findOne({ username })
+            .populate({
+                path: "bookmarks",
+                populate: {
+                    path: "author",
+                    select: "username profile_img"
+                }
+            })
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const validBookmarks = user.bookmarks.filter(post => post !== null);
+        res.status(200).json({ success: true, bookmarks: validBookmarks });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}

@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
     profile_img: {
         type: String,
         default: "https://res.cloudinary.com/dcezxzzxo/image/upload/v1769693349/posts/ch40q2asunurvlf1ljod.jpg"
-    }
+    },
+    bookmarks: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post"
+    }]
 }, { timestamps: true })
 
 module.exports = mongoose.model("User", userSchema)

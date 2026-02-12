@@ -4,7 +4,9 @@ const authMiddleware = require('../middleware/auth.middleware')
 const upload = require("../middleware/upload.middleware");
 const userController = require('../controllers/user.controller')
 
+router.get('/bookmarks/:username', userController.getUserBookmarks)
 router.get('/:username', userController.getUserProfile)
+router.patch('/bookmark/:id', authMiddleware, userController.bookmark)
 router.put('/profile', authMiddleware, upload.single("profile_img"), userController.updateProfile)
 
 module.exports = router
