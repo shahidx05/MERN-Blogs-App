@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment } from "../services/api";
-import { Heart, Share2, Trash2, MessageCircle, CaseLower } from "lucide-react";
+import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment, ToggleBookmark } from "../services/api";
+import { Heart, Bookmark, Trash2, MessageCircle } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
 
 const PostDetails = () => {
-    const { user } = useAuth()
+    const { user, setUser } = useAuth()
     const { id } = useParams()
     const [post, setPost] = useState(null)
     const [comments, setComments] = useState([])
@@ -74,6 +74,17 @@ const PostDetails = () => {
         setMycomment((prev) => !prev)
     }
 
+    const toggleSave = async () => {
+        try {
+            const res = await ToggleBookmark(id);
+            if (res.success) {
+                setUser({ ...user, bookmarks: res.bookmarks });
+            }
+        } catch (error) {
+            console.log("Error bookmarking post:", error);
+        }
+    }
+
     useEffect(() => {
         loadPost()
         loadComments()
@@ -103,6 +114,7 @@ const PostDetails = () => {
     }
 
     const isLiked = post.likes?.includes(user?._id);
+    const isBookmark = user.bookmarks?.includes(id);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -197,10 +209,20 @@ const PostDetails = () => {
                         </div>
 
                         {/* Share */}
-                        <button className="flex items-center gap-2 text-gray-600 hover:text-black transition">
-                            <Share2 className="w-5 h-5" />
+                        <button
+                            onClick={toggleSave}
+                            className={`flex items-center gap-2 transition ${isBookmark
+                                ? "text-blue-600 "
+                                : "text-gray-600 hover:text-blue-600"
+                                }`}
+                            title="Save post"
+                        >
+                            <Bookmark
+                                className="w-5 h-5"
+                                fill={isBookmark ? "currentColor" : "none"}
+                            />
                             <span className="text-sm font-medium">
-                                Share
+                                Save
                             </span>
                         </button>
 
