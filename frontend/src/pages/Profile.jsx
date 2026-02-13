@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMyPosts, DeletePost, Editprofile } from "../services/api";
+import { Bookmark, Edit3 } from "lucide-react";
 
 const Profile = () => {
   const { user, fetchUserProfile, setUser } = useAuth();
@@ -87,12 +88,28 @@ const Profile = () => {
             <p className="text-gray-600">@{user.username}</p>
             <p className="text-gray-500 text-sm">{user.email}</p>
           </div>
-          <Link
-            to="/edit-profile"
-            className="mt-4 px-4 py-2 text-sm border rounded-md bg-white text-gray-700 hover:bg-gray-100"
-          >
-            Edit Profile
-          </Link>
+
+          <div className="flex gap-4 mt-6">
+
+            {/* Edit Profile Button */}
+            <Link
+              to="/edit-profile"
+              className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 transition"
+            >
+              <Edit3 size={16} />
+              Edit Profile
+            </Link>
+
+            {/* Saved Bookmarks Button */}
+            <Link
+              to="/bookmarks"
+              className="flex items-center gap-2 px-4 py-2 text-sm border border-blue-600 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+            >
+              <Bookmark size={16} />
+              Saved Posts
+            </Link>
+
+          </div>
 
         </div>
 

@@ -221,3 +221,15 @@ export const ToggleBookmark = async (id) => {
 
   return res.json();
 };
+
+export const getBookmarks = async (username) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/users/bookmarks/${username}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` 
+    }
+  });
+  return res.json();
+}
