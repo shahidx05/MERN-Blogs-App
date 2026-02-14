@@ -1,4 +1,4 @@
-import { useState} from "react";
+import { useState } from "react";
 import { Createpost } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -41,7 +41,18 @@ const CreatePost = () => {
                 </h1>
             </div>
 
-            <div className="max-w-3xl mx-auto p-4">
+            <div className="max-w-3xl mx-auto p-4 space-y-4">
+                <div className="bg-white p-4 rounded shadow flex justify-center">
+                    {!img ? (
+                        <p>No image</p>
+                    ) : (
+                        <img
+                            src={URL.createObjectURL(img)}
+                            alt="Post"
+                            className="rounded object-cover"
+                        />
+                    )}
+                </div>
                 <div className="bg-white p-6 rounded shadow space-y-4">
                     <div>
                         <label className="block text-sm font-medium mb-1">
