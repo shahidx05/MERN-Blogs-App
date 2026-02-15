@@ -20,11 +20,12 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { name, username } = req.body;
+        const { name, username, description } = req.body;
         let updateData = {};
 
         if (name) updateData.name = name;
         if (username) updateData.username = username;
+        if (description) updateData.description = description;
 
         if (req.file) {
             const result = await uploadToCloudinary(req.file.buffer, "profiles");
