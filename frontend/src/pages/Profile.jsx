@@ -87,6 +87,11 @@ const Profile = () => {
             <h2 className="text-lg font-semibold">{user.name}</h2>
             <p className="text-gray-600">@{user.username}</p>
             <p className="text-gray-500 text-sm">{user.email}</p>
+            <p className="text-sm text-gray-700 mt-2 leading-relaxed">
+              {user.bio
+                ? user.bio
+                : "No bio added yet."}
+            </p>
           </div>
 
           <div className="flex gap-4 mt-6">

@@ -8,6 +8,7 @@ const EditProfile = () => {
     const { user, setUser } = useAuth()
     const [name, setName] = useState('')
     const [username, setUsername] = useState('')
+    const [bio, setBio] = useState('')
     const [email, setEmail] = useState('')
     const [img, setImg] = useState('')
     const [file, setFile] = useState(null)
@@ -18,6 +19,7 @@ const EditProfile = () => {
             setUsername(user.username)
             setEmail(user.email)
             setImg(user.profile_img);
+            setBio(user.bio || "")
         }
     }
 
@@ -38,6 +40,7 @@ const EditProfile = () => {
             const formData = new FormData();
             formData.append("name", name);
             formData.append("username", username);
+            formData.append("bio", bio);
             if (file) {
                 formData.append("profile_img", file);
             }
@@ -128,6 +131,19 @@ const EditProfile = () => {
                             value={username}
                             onChange={e => setUsername(e.target.value)}
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Bio</label>
+                        <textarea
+                            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-400 resize-none"
+                            rows="3"
+                            placeholder="Tell us about yourself..."
+                            value={bio}
+                            onChange={e => setBio(e.target.value)}
+                            maxLength={200}
+                        />
+                        <p className="text-xs text-gray-400 text-right">{bio.length}/200</p>
                     </div>
 
                     {/* Email (read-only) */}

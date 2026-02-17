@@ -20,18 +20,17 @@ exports.getUserProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        const { name, username, description } = req.body;
+        const { name, username, bio } = req.body;
         let updateData = {};
 
         if (name) updateData.name = name;
         if (username) updateData.username = username;
-        if (description) updateData.description = description;
+        if (bio) updateData.bio = bio;
 
         if (req.file) {
             const result = await uploadToCloudinary(req.file.buffer, "profiles");
             updateData.profile_img = result.secure_url;
         }
-
 
         const user = await User.findByIdAndUpdate(req.user.id,
             updateData,
