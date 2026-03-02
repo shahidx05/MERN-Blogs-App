@@ -1,1 +1,304 @@
 @import "tailwindcss";
+/* ============================================================
+   🎨 SOCIAL BLOG APP — COLOR SYSTEM
+   All colors are defined here as CSS variables.
+   To change the theme, just update values below.
+   ============================================================ */
+
+@layer base {
+
+  /* ─────────────────────────────────────────
+     ☀️  LIGHT MODE (default)
+  ───────────────────────────────────────── */
+  :root {
+    /* Brand / Primary */
+    --color-primary:         #6366F1;   /* Indigo — buttons, links, highlights */
+    --color-primary-hover:   #4F46E5;   /* Darker indigo on hover */
+    --color-primary-light:   #EEF2FF;   /* Soft indigo bg (badges, chips) */
+
+    /* Accent */
+    --color-accent:          #F43F5E;   /* Rose — likes, alerts, notifications */
+    --color-accent-hover:    #E11D48;
+
+    /* Success / Warning / Error */
+    --color-success:         #22C55E;
+    --color-warning:         #F59E0B;
+    --color-error:           #EF4444;
+
+    /* Backgrounds */
+    --color-bg:              #F9FAFB;   /* App background */
+    --color-bg-card:         #FFFFFF;   /* Card / post background */
+    --color-bg-input:        #F3F4F6;   /* Input fields */
+    --color-bg-hover:        #F3F4F6;   /* Hover state on items */
+    --color-bg-overlay:      rgba(0,0,0,0.4); /* Modal overlay */
+
+    /* Borders */
+    --color-border:          #E5E7EB;   /* Default border */
+    --color-border-focus:    #6366F1;   /* Input focus border */
+
+    /* Text */
+    --color-text-primary:    #111827;   /* Main headings, body */
+    --color-text-secondary:  #6B7280;   /* Subtitles, metadata */
+    --color-text-muted:      #9CA3AF;   /* Placeholders, timestamps */
+    --color-text-inverse:    #FFFFFF;   /* Text on dark/primary bg */
+    --color-text-link:       #6366F1;   /* Clickable links */
+
+    /* Sidebar / Navbar */
+    --color-nav-bg:          #FFFFFF;
+    --color-nav-border:      #E5E7EB;
+    --color-nav-text:        #374151;
+    --color-nav-active:      #6366F1;
+    --color-nav-active-bg:   #EEF2FF;
+
+    /* Avatar placeholder */
+    --color-avatar-bg:       #C7D2FE;
+    --color-avatar-text:     #4338CA;
+
+    /* Tag / Badge */
+    --color-tag-bg:          #E0E7FF;
+    --color-tag-text:        #4338CA;
+
+    /* Scrollbar */
+    --color-scrollbar:       #D1D5DB;
+    --color-scrollbar-thumb: #9CA3AF;
+
+    /* Shadow */
+    --shadow-card:           0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-dropdown:       0 10px 15px -3px rgba(0,0,0,0.1);
+  }
+
+  /* ─────────────────────────────────────────
+     🌙  DARK MODE
+     Applied when <html class="dark"> is set
+  ───────────────────────────────────────── */
+  .dark {
+    /* Brand / Primary */
+    --color-primary:         #818CF8;   /* Lighter indigo for dark bg */
+    --color-primary-hover:   #6366F1;
+    --color-primary-light:   #1E1B4B;
+
+    /* Accent */
+    --color-accent:          #FB7185;
+    --color-accent-hover:    #F43F5E;
+
+    /* Success / Warning / Error */
+    --color-success:         #4ADE80;
+    --color-warning:         #FCD34D;
+    --color-error:           #F87171;
+
+    /* Backgrounds */
+    --color-bg:              #0F172A;   /* App background — deep navy */
+    --color-bg-card:         #1E293B;   /* Card background — slate */
+    --color-bg-input:        #334155;   /* Input background */
+    --color-bg-hover:        #334155;
+    --color-bg-overlay:      rgba(0,0,0,0.6);
+
+    /* Borders */
+    --color-border:          #334155;
+    --color-border-focus:    #818CF8;
+
+    /* Text */
+    --color-text-primary:    #F1F5F9;
+    --color-text-secondary:  #94A3B8;
+    --color-text-muted:      #64748B;
+    --color-text-inverse:    #0F172A;
+    --color-text-link:       #818CF8;
+
+    /* Sidebar / Navbar */
+    --color-nav-bg:          #1E293B;
+    --color-nav-border:      #334155;
+    --color-nav-text:        #CBD5E1;
+    --color-nav-active:      #818CF8;
+    --color-nav-active-bg:   #1E1B4B;
+
+    /* Avatar placeholder */
+    --color-avatar-bg:       #312E81;
+    --color-avatar-text:     #C7D2FE;
+
+    /* Tag / Badge */
+    --color-tag-bg:          #1E1B4B;
+    --color-tag-text:        #A5B4FC;
+
+    /* Scrollbar */
+    --color-scrollbar:       #1E293B;
+    --color-scrollbar-thumb: #475569;
+
+    /* Shadow */
+    --shadow-card:           0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-dropdown:       0 10px 15px -3px rgba(0,0,0,0.5);
+  }
+}
+
+/* ============================================================
+   🔧 REUSABLE COMPONENT CLASSES (using CSS variables)
+   Use these class names directly in your JSX components
+   ============================================================ */
+
+@layer components {
+
+  /* ── Backgrounds ── */
+  .bg-app          { background-color: var(--color-bg); }
+  .bg-card         { background-color: var(--color-bg-card); }
+  .bg-input-c      { background-color: var(--color-bg-input); }
+
+  /* ── Text ── */
+  .text-primary-c  { color: var(--color-text-primary); }
+  .text-secondary-c{ color: var(--color-text-secondary); }
+  .text-muted-c    { color: var(--color-text-muted); }
+  .text-link-c     { color: var(--color-text-link); }
+
+  /* ── Borders ── */
+  .border-c        { border-color: var(--color-border); }
+
+  /* ── Navbar ── */
+  .bg-nav          { background-color: var(--color-nav-bg); }
+  .border-nav      { border-color: var(--color-nav-border); }
+
+  /* ── Primary Button ── */
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer inline-flex items-center gap-2;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    @apply shadow-md;
+  }
+  .btn-primary:active {
+    @apply scale-95;
+  }
+
+  /* ── Ghost Button ── */
+  .btn-ghost {
+    color: var(--color-text-secondary);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer inline-flex items-center gap-2;
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  /* ── Danger Button ── */
+  .btn-danger {
+    background-color: var(--color-error);
+    color: #fff;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer;
+  }
+
+  /* ── Tags / Badges ── */
+  .tag {
+    background-color: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    @apply text-xs font-medium px-2.5 py-1 rounded-full cursor-pointer transition-all duration-150;
+  }
+  .tag:hover {
+    @apply opacity-80;
+  }
+
+  /* ── Card ── */
+  .card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+    @apply rounded-xl transition-all duration-200;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-dropdown);
+  }
+
+  /* ── Input Field ── */
+  .input-field {
+    background-color: var(--color-bg-input);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    @apply w-full px-4 py-2.5 rounded-lg text-sm outline-none transition-all duration-200;
+  }
+  .input-field:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+  .input-field::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* ── Avatar Placeholder ── */
+  .avatar-placeholder {
+    background-color: var(--color-avatar-bg);
+    color: var(--color-avatar-text);
+    @apply flex items-center justify-center font-semibold rounded-full select-none;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    border-color: var(--color-border);
+    @apply border-t w-full;
+  }
+
+  /* ── Like Button (accent) ── */
+  .btn-like {
+    color: var(--color-text-muted);
+    @apply flex items-center gap-1.5 text-sm transition-all duration-200 cursor-pointer;
+  }
+  .btn-like:hover,
+  .btn-like.active {
+    color: var(--color-accent);
+  }
+
+  /* ── Dropdown Menu ── */
+  .dropdown {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-dropdown);
+    @apply rounded-xl py-1 min-w-[160px] z-50;
+  }
+  .dropdown-item {
+    color: var(--color-nav-text);
+    @apply flex items-center gap-2 px-4 py-2.5 text-sm transition-all duration-150 cursor-pointer;
+  }
+  .dropdown-item:hover {
+    background-color: var(--color-bg-hover);
+  }
+}
+
+/* ============================================================
+   🌀 GLOBAL BASE STYLES
+   ============================================================ */
+
+@layer base {
+  * {
+    @apply box-border m-0 p-0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    @apply antialiased font-sans transition-colors duration-300 min-h-screen;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-primary);
+    @apply font-bold leading-tight;
+  }
+
+  a {
+    color: var(--color-text-link);
+    @apply transition-colors duration-150;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar        { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track  { background: var(--color-scrollbar); }
+  ::-webkit-scrollbar-thumb  { background: var(--color-scrollbar-thumb); border-radius: 99px; }
+
+  /* Text selection */
+  ::selection {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+}
