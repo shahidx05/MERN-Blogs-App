@@ -1,103 +1,183 @@
 import { useState } from "react";
 import { Createpost } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { MdImage, MdClose, MdErrorOutline } from "react-icons/md";
+import RichTextEditor from "../components/RichTextEditor";
 
 const CreatePost = () => {
-    const [title, setTitle] = useState("")
-    const [content, setContent] = useState("")
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
     const [img, setImg] = useState(null);
-    const navigate = useNavigate()
+    const [preview, setPreview] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleImage = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImg(file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const removeImage = () => {
+        setImg(null);
+        setPreview(null);
+    };
 
     const submitHandler = async (e) => {
-        e.preventDefault()
-        if (!title || !content) {
-            alert("Title and content are required");
+        e.preventDefault();
+        setError("");
+        if (!title || !content || content === "<p></p>") {
+            setError("Title and content are required.");
             return;
         }
+        setLoading(true);
         try {
             const formData = new FormData();
             formData.append("title", title);
             formData.append("content", content);
             if (img) formData.append("img", img);
 
-            const data = await Createpost(formData)
+            const data = await Createpost(formData);
             if (data.success) {
                 navigate("/profile");
             } else {
-                alert(data.message || "Failed to create post");
+                setError(data.message || "Failed to create post.");
             }
         } catch (error) {
+            setError(error?.response?.data?.message || "Something went wrong.");
             console.log(error);
-            alert("Something went wrong");
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            {/* Header */}
-            <div className="bg-white shadow p-4">
-                <h1 className="text-xl font-semibold text-center">
-                    Create Post
-                </h1>
-            </div>
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <div className="max-w-3xl mx-auto px-4 py-8 space-y-5">
 
-            <div className="max-w-3xl mx-auto p-4 space-y-4">
-                <div className="bg-white p-4 rounded shadow flex justify-center">
-                    {!img ? (
-                        <p>No image</p>
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                    <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                        Create Post
+                    </h1>
+                    <Link
+                        to="/profile"
+                        className="text-sm hover:underline"
+                        style={{ color: 'var(--color-text-muted)' }}
+                    >
+                        ← Cancel
+                    </Link>
+                </div>
+
+                {/* Error */}
+                {error && (
+                    <div
+                        className="flex items-center gap-2 text-sm px-3 py-2.5 rounded-lg"
+                        style={{
+                            backgroundColor: 'color-mix(in srgb, var(--color-error) 10%, transparent)',
+                            color: 'var(--color-error)',
+                            border: '1px solid color-mix(in srgb, var(--color-error) 25%, transparent)',
+                        }}
+                    >
+                        <MdErrorOutline size={16} />
+                        {error}
+                    </div>
+                )}
+
+                {/* Cover Image */}
+                <div
+                    className="rounded-2xl border overflow-hidden"
+                    style={{
+                        backgroundColor: 'var(--color-bg-card)',
+                        borderColor: 'var(--color-border)',
+                        boxShadow: 'var(--shadow-card)',
+                    }}
+                >
+                    {preview ? (
+                        <div className="relative">
+                            <img
+                                src={preview}
+                                alt="Cover"
+                                className="w-full h-56 object-cover"
+                            />
+                            <button
+                                type="button"
+                                onClick={removeImage}
+                                className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: 'rgba(0,0,0,0.55)', color: '#fff' }}
+                            >
+                                <MdClose size={16} />
+                            </button>
+                        </div>
                     ) : (
-                        <img
-                            src={URL.createObjectURL(img)}
-                            alt="Post"
-                            className="rounded object-cover"
-                        />
+                        <label
+                            className="flex flex-col items-center justify-center h-40 cursor-pointer gap-2"
+                            style={{ color: 'var(--color-text-muted)' }}
+                        >
+                            <MdImage size={32} />
+                            <span className="text-sm">Click to add a cover image</span>
+                            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>optional</span>
+                            <input type="file" accept="image/*" hidden onChange={handleImage} />
+                        </label>
                     )}
                 </div>
-                <div className="bg-white p-6 rounded shadow space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
+
+                {/* Form */}
+                <div
+                    className="rounded-2xl border p-6 space-y-5"
+                    style={{
+                        backgroundColor: 'var(--color-bg-card)',
+                        borderColor: 'var(--color-border)',
+                        boxShadow: 'var(--shadow-card)',
+                    }}
+                >
+                    {/* Title */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                             Title
                         </label>
                         <input
                             type="text"
-                            placeholder="Post title"
-                            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
+                            placeholder="Your post title..."
+                            className="input-field text-base font-medium"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
+                    {/* Content */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                             Content
                         </label>
-                        <textarea
-                            rows="6"
-                            placeholder="Write your post..."
-                            className="w-full border px-3 py-2 rounded focus:outline-none focus:ring"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                        <RichTextEditor
+                            content={content}
+                            onChange={setContent}
+                            placeholder="Write your story..."
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Post Image (optional)
-                        </label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="w-full"
-                            onChange={(e) => setImg(e.target.files[0])}
-                        />
+                    {/* Submit */}
+                    <div className="flex justify-end pt-1">
+                        <button
+                            onClick={submitHandler}
+                            disabled={loading}
+                            className="px-6 py-2.5 rounded-lg text-sm font-semibold"
+                            style={{
+                                backgroundColor: 'var(--color-primary)',
+                                color: 'var(--color-text-inverse)',
+                                opacity: loading ? 0.7 : 1,
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                            }}
+                        >
+                            {loading ? 'Publishing...' : 'Publish Post'}
+                        </button>
                     </div>
-
-                    <button className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
-                        onClick={submitHandler}
-                    >
-                        Publish Post
-                    </button>
                 </div>
+
             </div>
         </div>
     );

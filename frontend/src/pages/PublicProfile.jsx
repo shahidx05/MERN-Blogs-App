@@ -1,45 +1,85 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { getUser, getUserPosts } from '../services/api'
+import { useParams } from "react-router-dom";
+import { getUser, getUserPosts, ToggleLike, ToggleBookmark } from '../services/api'
+import { MdCalendarToday } from "react-icons/md";
+import PostCard from "../components/PostCard";
 
 const PublicProfile = () => {
     const { username } = useParams()
     const [user, setUser] = useState(null)
-    const [posts, setposts] = useState([])
+    const [posts, setPosts] = useState([])
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        setPosts([]);
+        setUser(null);
+        setLoading(true);
+        loadProfile();
+    }, [username]);
 
     const loadProfile = async () => {
         try {
-            const data = await getUser(username)
-            if (data) {
-                setUser(data.user)
-            }
+            const data = await getUser(username);
+            if (data) setUser(data.user);
         } catch (error) {
-            alert("something went wrong")
-            console.log(error)
+            alert("Something went wrong");
+            console.log(error);
         }
-    }
+    };
 
     const loadPosts = async () => {
         try {
             const data = await getUserPosts(user._id)
             if (data) {
-                setposts(data.posts)
+                setPosts(data.posts)
             }
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false);
         }
     }
-
-    useEffect(() => {
-        setposts([]); 
-        loadProfile()
-    }, [username])
 
     useEffect(() => {
         if (user?._id) {
             loadPosts();
         }
     }, [user])
+
+
+    const toggleLike = async (id) => {
+        setPosts(prev =>
+            prev.map(post => {
+                if (post._id === id) {
+                    const hasLiked = post.likes.includes(user?._id)
+                    const updatedLikes = hasLiked
+                        ? post.likes.filter((userId) => userId !== user?._id)
+                        : [...post.likes, user?._id];
+                    return { ...post, likes: updatedLikes };
+                }
+                return post
+            }
+            )
+        );
+
+        try {
+            await ToggleLike(id)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const toggleSave = async (id) => {
+        try {
+            const res = await ToggleBookmark(id);
+            if (res.success) {
+                setUser({ ...user, bookmarks: res.bookmarks });
+            }
+        } catch (error) {
+            console.log("Error bookmarking post:", error);
+        }
+    }
 
     const formatDate = (date) =>
         new Date(date).toLocaleDateString("en-US", {
@@ -50,82 +90,117 @@ const PublicProfile = () => {
 
 
     if (!user) {
-        return <p className="text-center mt-10">Loading...</p>;
+        return (
+            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
+            </div>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-5xl mx-auto p-4 space-y-8">
+        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+            <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
-                {/* Profile Header */}
-                <div className="bg-white rounded shadow p-6 flex flex-col items-center">
-                    <img
-                        src={user.profile_img}
-                        alt="User"
-                        className="w-32 h-32 rounded-full object-cover border mb-4"
+                {/* ── Profile Card ── */}
+                <div
+                    className="rounded-2xl border overflow-hidden"
+                    style={{
+                        backgroundColor: 'var(--color-bg-card)',
+                        borderColor: 'var(--color-border)',
+                        boxShadow: 'var(--shadow-card)',
+                    }}
+                >
+                    {/* Banner */}
+                    <div
+                        className="h-28 w-full"
+                        style={{
+                            background: 'linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%)',
+                        }}
                     />
 
-                    <h2 className="text-xl font-semibold">
-                        {user.name}
-                    </h2>
-                    <p className="text-gray-600">@{user.username}</p>
+                    <div className="px-6 pb-6">
+                        {/* Avatar + stats row */}
+                        <div className="flex items-end justify-between -mt-12 mb-4">
+                            <img
+                                src={user.profile_img}
+                                alt={user.name}
+                                className="w-24 h-24 rounded-full object-cover border-4"
+                                style={{ borderColor: 'var(--color-bg-card)' }}
+                            />
+                            <div
+                                className="text-center px-5 py-2 rounded-xl border"
+                                style={{
+                                    backgroundColor: 'var(--color-bg-input)',
+                                    borderColor: 'var(--color-border)',
+                                }}
+                            >
+                                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                                    {posts.length}
+                                </p>
+                                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
+                            </div>
+                        </div>
 
-                    <p className="text-gray-500 text-sm mt-1">
-                        Member since {formatDate(user.createdAt)}
-                    </p>
+                        {/* Name & username */}
+                        <h2 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                            {user.name}
+                        </h2>
+                        <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                            @{user.username}
+                        </p>
+
+                        {/* Bio */}
+                        {user.bio && (
+                            <p className="text-sm mt-3 leading-relaxed max-w-lg" style={{ color: 'var(--color-text-secondary)' }}>
+                                {user.bio}
+                            </p>
+                        )}
+
+                        {/* Joined date */}
+                        {user.createdAt && (
+                            <div className="flex items-center gap-1.5 mt-3" style={{ color: 'var(--color-text-muted)' }}>
+                                <MdCalendarToday size={13} />
+                                <span className="text-xs">Joined {formatDate(user.createdAt)}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* User Posts */}
+                {/* ── Posts Section ── */}
                 <div>
-                    <h3 className="text-lg font-semibold mb-4">
+                    <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                         Posts by {user.name}
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {posts.map((post) => (
-                            <div
-                                key={post._id}
-                                className="bg-white rounded shadow overflow-hidden"
-                            >
-                                {/* Post Image */}
-                                {post.img && (
-                                    <img
-                                        src={post.img}
-                                        alt={post.title}
-                                        className="h-48 w-full object-cover"
-                                    />
-                                )}
-
-                                {/* Post Content */}
-                                <div className="p-4">
-                                    <h4 className="font-semibold text-lg mb-1">
-                                        {post.title}
-                                    </h4>
-
-                                    <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                                        {post.content}
-                                    </p>
-
-                                    <div className="flex justify-between items-center text-sm text-gray-500">
-                                        <span>{formatDate(post.createdAt)}</span>
-                                        <button className="text-blue-600 hover:underline">
-                                            <Link to={`/post/${post._id}`}>
-                                                Read more →
-                                            </Link>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Empty State */}
-                    {posts.length === 0 && (
-                        <p className="text-center text-gray-500 mt-6">
-                            This user hasn’t posted anything yet.
+                    {loading ? (
+                        <p className="text-sm text-center py-10" style={{ color: 'var(--color-text-muted)' }}>
+                            Loading posts...
                         </p>
+                    ) : posts.length === 0 ? (
+                        <div
+                            className="rounded-xl border py-14 text-center"
+                            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-card)' }}
+                        >
+                            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                                This user hasn't posted anything yet.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {posts.map((post) => (
+                                <PostCard
+                                    key={post._id}
+                                    post={post}
+                                    currentUserId={user._id}
+                                    bookmarks={user.bookmarks}
+                                    onLike={toggleLike}
+                                    onBookmark={toggleSave}
+                                />
+                            ))}
+                        </div>
                     )}
                 </div>
+
             </div>
         </div>
     );
