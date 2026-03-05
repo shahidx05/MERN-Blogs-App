@@ -7,12 +7,18 @@ const Navbar = () => {
   const { isLoggedIn, Logout, user } = useAuth();
   const navigate = useNavigate();
 
+  // ── Dark mode toggle (add this to your app root if you want it global) ──
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const toggleDark = () => {
+    document.documentElement.classList.toggle('dark');
+    setDark((prev) => !prev);
+  };
+
   // ── Mobile menu ──
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }) =>
-    `flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 ${
-      isActive ? '' : ''
+    `flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 ${isActive ? '' : ''
     }`;
 
   const navLinkStyle = (isActive) => ({
@@ -61,11 +67,12 @@ const Navbar = () => {
 
               {/* Dark mode toggle */}
               <button
+                onClick={toggleDark}
                 className="p-1.5 rounded-lg transition-colors"
                 style={{ color: 'var(--color-text-muted)' }}
                 title="Toggle theme"
               >
-                {/* {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />} */}
+                {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
               </button>
 
               {/* Logout */}
@@ -91,10 +98,12 @@ const Navbar = () => {
             <>
               {/* Dark mode toggle */}
               <button
+                onClick={toggleDark}
                 className="p-1.5 rounded-lg transition-colors"
                 style={{ color: 'var(--color-text-muted)' }}
                 title="Toggle theme"
               >
+                {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
               </button>
 
               <NavLink to="/login" className={navLinkClass} style={({ isActive }) => navLinkStyle(isActive)}>
@@ -119,18 +128,23 @@ const Navbar = () => {
         {/* ── Mobile: right side ── */}
         <div className="flex md:hidden items-center gap-3">
           <button
+            onClick={toggleDark}
             className="p-1.5 rounded-lg"
             style={{ color: 'var(--color-text-muted)' }}
           >
+            {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
           </button>
 
           {isLoggedIn && user && (
-            <img
-              src={user.profile_img}
-              alt="Avatar"
-              className="w-8 h-8 rounded-full object-cover border-2"
-              style={{ borderColor: 'var(--color-primary)' }}
-            />
+            <NavLink to="/profile">
+              <img
+                src={user.profile_img}
+                alt="Avatar"
+
+                className="w-8 h-8 rounded-full object-cover border-2"
+                style={{ borderColor: 'var(--color-primary)' }}
+              />
+            </NavLink>
           )}
 
           <button

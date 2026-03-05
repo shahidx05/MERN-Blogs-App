@@ -108,7 +108,7 @@ const Home = () => {
             <PostCard
               key={post._id}
               post={post}
-              currentUserId={user._id}
+              currentUserId={user?._id}
               bookmarks={user.bookmarks}
               onLike={toggleLike}
               onBookmark={toggleSave}
