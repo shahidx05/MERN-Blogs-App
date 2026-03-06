@@ -4,18 +4,20 @@ const authRoutes = require('./routes/auth.routes')
 const postRoutes = require('./routes/post.routes')
 const userRoutes = require('./routes/user.routes')
 const commentRoutes = require('./routes/comment.routes')
+const { apiLimiter } = require("./middleware/rateLimiter");
 const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 4000
 
-app.use(cors());
-// app.use(cors({
-//   origin: process.env.CLIENT_URL,
-//   credentials: true
-// }));
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
 app.use(express.json())
 connectDB();
+
+app.use("/api", apiLimiter);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
