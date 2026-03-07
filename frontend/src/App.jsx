@@ -11,6 +11,8 @@ import PostDetails from './pages/PostDetails';
 import PublicProfile from './pages/PublicProfile';
 import EditProfile from './pages/EditProfile';
 import Bookmarks from './pages/Bookmarks';
+import NotFound from './pages/NotFound';
+
 const App = () => {
 
   return (
@@ -28,6 +30,7 @@ const App = () => {
           <Route path="/edit-post/:id" element={<EditPost />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </>
