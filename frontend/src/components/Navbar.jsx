@@ -1,25 +1,33 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { MdHome, MdAdd, MdPerson, MdLogout, MdLogin, MdAppRegistration, MdLightMode, MdDarkMode, MdMenu, MdClose } from "react-icons/md";
+import {
+  MdHome, MdAdd, MdPerson, MdLogout, MdLogin,
+  MdAppRegistration, MdLightMode, MdDarkMode,
+  MdMenu, MdClose, MdSearch
+} from "react-icons/md";
 
 const Navbar = () => {
   const { isLoggedIn, Logout, user } = useAuth();
   const navigate = useNavigate();
 
-  // ── Dark mode toggle (add this to your app root if you want it global) ──
+  const [q, setq] = useState("")
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (!q.trim()) return;
+      navigate(`/?q=${q}`);
+    }
+  }
+
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
   const toggleDark = () => {
     document.documentElement.classList.toggle('dark');
     setDark((prev) => !prev);
   };
 
-  // ── Mobile menu ──
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navLinkClass = ({ isActive }) =>
-    `flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 ${isActive ? '' : ''
-    }`;
 
   const navLinkStyle = (isActive) => ({
     color: isActive ? 'var(--color-nav-active)' : 'var(--color-nav-text)',
@@ -34,38 +42,65 @@ const Navbar = () => {
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
         {/* ── Logo ── */}
         <Link
           to="/"
-          className="text-xl font-bold tracking-tight"
+          className="text-xl font-bold tracking-tight flex-shrink-0"
           style={{ color: 'var(--color-primary)' }}
         >
           Blogs
         </Link>
 
+        {/* ── Search bar (desktop) ── */}
+        <div className="hidden md:flex flex-1 max-w-sm relative">
+          <MdSearch
+            size={17}
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--color-text-muted)' }}
+          />
+          <input
+            type="text"
+            placeholder="Search articles..."
+            className="input-field pl-9 py-1.5 text-sm w-full"
+            value={q}
+            onChange={(e) => setq(e.target.value)}
+            onKeyDown={handleSearch}
+          />
+        </div>
+
         {/* ── Desktop Nav ── */}
         <div className="hidden md:flex items-center gap-5">
 
-          <NavLink to="/" className={navLinkClass} style={({ isActive }) => navLinkStyle(isActive)}>
+          <NavLink
+            to="/"
+            className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+            style={({ isActive }) => navLinkStyle(isActive)}
+          >
             <MdHome size={18} /> Home
           </NavLink>
 
           {isLoggedIn && user ? (
             <>
-              <NavLink to="/create-post" className={navLinkClass} style={({ isActive }) => navLinkStyle(isActive)}>
+              <NavLink
+                to="/create-post"
+                className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+                style={({ isActive }) => navLinkStyle(isActive)}
+              >
                 <MdAdd size={18} /> Create
               </NavLink>
 
-              <NavLink to="/profile" className={navLinkClass} style={({ isActive }) => navLinkStyle(isActive)}>
+              <NavLink
+                to="/profile"
+                className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+                style={({ isActive }) => navLinkStyle(isActive)}
+              >
                 <MdPerson size={18} /> Profile
               </NavLink>
 
-              {/* Divider */}
               <span className="h-5 w-px" style={{ backgroundColor: 'var(--color-border)' }} />
 
-              {/* Dark mode toggle */}
               <button
                 onClick={toggleDark}
                 className="p-1.5 rounded-lg transition-colors"
@@ -75,7 +110,6 @@ const Navbar = () => {
                 {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
               </button>
 
-              {/* Logout */}
               <button
                 onClick={() => { Logout(); navigate("/login"); }}
                 className="flex items-center gap-1.5 text-sm font-medium transition-colors"
@@ -84,7 +118,6 @@ const Navbar = () => {
                 <MdLogout size={16} /> Logout
               </button>
 
-              {/* Avatar */}
               <NavLink to="/profile">
                 <img
                   src={user.profile_img}
@@ -96,7 +129,6 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              {/* Dark mode toggle */}
               <button
                 onClick={toggleDark}
                 className="p-1.5 rounded-lg transition-colors"
@@ -106,13 +138,17 @@ const Navbar = () => {
                 {dark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
               </button>
 
-              <NavLink to="/login" className={navLinkClass} style={({ isActive }) => navLinkStyle(isActive)}>
+              <NavLink
+                to="/login"
+                className="flex items-center gap-1.5 text-sm font-medium transition-colors"
+                style={({ isActive }) => navLinkStyle(isActive)}
+              >
                 <MdLogin size={18} /> Login
               </NavLink>
 
               <NavLink to="/register">
                 <span
-                  className="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors"
+                  className="text-sm font-semibold px-4 py-1.5 rounded-lg"
                   style={{
                     backgroundColor: 'var(--color-primary)',
                     color: 'var(--color-text-inverse)',
@@ -140,7 +176,6 @@ const Navbar = () => {
               <img
                 src={user.profile_img}
                 alt="Avatar"
-
                 className="w-8 h-8 rounded-full object-cover border-2"
                 style={{ borderColor: 'var(--color-primary)' }}
               />
@@ -153,6 +188,28 @@ const Navbar = () => {
           >
             {menuOpen ? <MdClose size={22} /> : <MdMenu size={22} />}
           </button>
+        </div>
+      </div>
+
+      {/* ── Mobile Search bar (always visible on mobile) ── */}
+      <div
+        className="md:hidden px-4 py-2 border-t"
+        style={{ borderColor: 'var(--color-nav-border)', backgroundColor: 'var(--color-nav-bg)' }}
+      >
+        <div className="relative">
+          <MdSearch
+            size={17}
+            className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+            style={{ color: 'var(--color-text-muted)' }}
+          />
+          <input
+            type="text"
+            placeholder="Search articles..."
+            className="input-field pl-9 py-2 text-sm w-full"
+            value={q}
+            onChange={(e) => setq(e.target.value)}
+            onKeyDown={handleSearch}
+          />
         </div>
       </div>
 

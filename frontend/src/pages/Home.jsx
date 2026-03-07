@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { getAllPosts, ToggleLike, ToggleBookmark } from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { MdSearch, MdTrendingUp } from "react-icons/md";
+import { MdTrendingUp } from "react-icons/md";
 import PostCard from "../components/PostCard";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   const { user, setUser } = useAuth();
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [q, setq] = useState("");
+
+  const [searchParams] = useSearchParams();
+  const q = searchParams.get("q") || "";
 
   const loadPosts = async (pageNumber = 1) => {
     try {
@@ -80,22 +85,6 @@ const Home = () => {
             >
               Latest Posts
             </h1>
-          </div>
-
-          {/* Search */}
-          <div className="relative w-full sm:w-72">
-            <MdSearch
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: "var(--color-text-muted)" }}
-            />
-            <input
-              type="text"
-              placeholder="Search articles..."
-              className="input-field pl-9"
-              value={q}
-              onChange={(e) => setq(e.target.value)}
-            />
           </div>
         </div>
 
@@ -168,7 +157,7 @@ const Home = () => {
             </p>
             {q && (
               <button
-                onClick={() => setq("")}
+                onClick={() => navigate("/")}
                 className="mt-3 text-sm hover:underline"
                 style={{ color: "var(--color-primary)" }}
               >
