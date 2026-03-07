@@ -20,8 +20,8 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/post/:id' element={<PostDetails/>} />
-        <Route path='/user/:username' element={<PublicProfile/>} />
+        <Route path='/post/:id' element={<PostDetails />} />
+        <Route path='/user/:username' element={<PublicProfile />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-post" element={<CreatePost />} />
