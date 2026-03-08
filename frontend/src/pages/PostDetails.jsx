@@ -16,8 +16,11 @@ const PostDetails = () => {
     const [content, setContent] = useState('');
     const [myComment, setMycomment] = useState(false);
     const [sortType, setSortType] = useState("latest");
-    const [visibleCount, setVisibleCount] = useState(5);
     const [copied, setCopied] = useState(false);
+    const [commentPage, setCommentPage] = useState(1);
+    const [hasMoreComments, setHasMoreComments] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
+
 
     const loadPost = async () => {
         try {
@@ -25,17 +28,22 @@ const PostDetails = () => {
             setPost(data.post);
         } catch (error) { console.log(error); }
     };
-
-    const loadComments = async () => {
+    const loadComments = async (page = 1) => {
         try {
-            const res = await getPostComments(id);
-            if (res) setComments(res.comments);
+            setCommentLoading(true);
+            const res = await getPostComments(id, page, 5);
+            if (res) {
+                setComments(prev => page === 1 ? res.comments : [...prev, ...res.comments]);
+                setHasMoreComments(res.hasMore);
+                setCommentPage(page);
+            }
         } catch (error) { console.log(error); }
+        finally { setCommentLoading(false); }
     };
 
     useEffect(() => {
         loadPost();
-        loadComments();
+        loadComments(1);
     }, []);
 
     const toggleLike = async () => {
@@ -320,7 +328,7 @@ const PostDetails = () => {
                         </div>
                     ) : (
                         <div className="space-y-3">
-                            {filteredComments.slice(0, visibleCount).map((c) => {
+                            {filteredComments.map((c) => {
                                 const isOwn = c.author._id === user?._id;
                                 const canDelete = user && (user._id === c.author._id || user._id === post.author._id);
                                 return (
@@ -384,18 +392,20 @@ const PostDetails = () => {
                     )}
 
                     {/* Load more */}
-                    {filteredComments.length > visibleCount && (
+                    {hasMoreComments && (
                         <div className="flex justify-center pt-2">
                             <button
-                                onClick={() => setVisibleCount(prev => prev + 5)}
+                                onClick={() => loadComments(commentPage + 1)}
+                                disabled={commentLoading}
                                 className="text-sm px-5 py-2 rounded-lg border"
                                 style={{
                                     borderColor: 'var(--color-border)',
                                     color: 'var(--color-text-secondary)',
                                     backgroundColor: 'var(--color-bg-input)',
+                                    opacity: commentLoading ? 0.6 : 1,
                                 }}
                             >
-                                Load more comments
+                                {commentLoading ? "Loading..." : "Load more comments"}
                             </button>
                         </div>
                     )}

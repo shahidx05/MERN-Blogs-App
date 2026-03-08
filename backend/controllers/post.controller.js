@@ -1,4 +1,6 @@
 const Post = require('../models/Post')
+const User = require('../models/User')
+const Comment = require('../models/Comment')
 const mongoose = require('mongoose')
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
@@ -15,10 +17,12 @@ exports.getPosts = async (req, res) => {
         let filter = {};
 
         if (q.trim() !== "") {
+            // 👇 escape special regex characters from user input
+            const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filter = {
                 $or: [
-                    { title: { $regex: q, $options: "i" } },
-                    { content: { $regex: q, $options: "i" } }
+                    { title: { $regex: escaped, $options: "i" } },
+                    { content: { $regex: escaped, $options: "i" } }
                 ]
             };
         }
@@ -268,6 +272,9 @@ exports.delete = async (req, res) => {
         }
 
         await post.deleteOne()
+
+        await Comment.deleteMany({ post: id })
+        await User.updateMany({ bookmarks: id }, { $pull: { bookmarks: id } })
 
         res.status(200).json({ message: "Post deleted successfully" })
     }

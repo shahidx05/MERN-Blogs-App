@@ -9,7 +9,7 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState(localStorage.getItem('token') || localStorage.getItem('token'))
+    const [token, setToken] = useState(localStorage.getItem('token') || '')
     const [user, setUser] = useState(null)
 
     const fetchUserProfile = async () => {

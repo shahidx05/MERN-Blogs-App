@@ -31,8 +31,8 @@ const App = () => {
           <Route path="/edit-post/:id" element={<EditPost />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
-          <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )

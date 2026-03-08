@@ -168,8 +168,8 @@ export const ToggleLike = async (id) => {
   return res.json();
 };
 
-export const getPostComments = async (id) => {
-  const res = await fetch(`${API}/comments/${id}`, {
+export const getPostComments = async (id, page=1, limit=5) => {
+  const res = await fetch(`${API}/comments/${id}?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

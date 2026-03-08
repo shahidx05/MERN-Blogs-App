@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "User already exists" })
         }
 
-        newUser = await User.create({
+        const newUser = await User.create({
             name,
             username,
             email,
