@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   MdFavorite, MdFavoriteBorder,
   MdBookmark, MdBookmarkBorder,
-  MdDelete, MdEdit,
+  MdDelete, MdEdit, MdVisibility
 } from "react-icons/md";
 
 const formatDate = (date) =>
@@ -123,7 +123,13 @@ const PostCard = ({
 
             {/* Left: like · bookmark */}
             <div className="flex items-center gap-3.5">
-
+              <span
+                className="flex items-center gap-1"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                <MdVisibility size={18} />
+                <span className="text-xs">{post.views ?? 0}</span>
+              </span>
               {/* Like */}
               {onLike ? (
                 <button

@@ -4,7 +4,7 @@ import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment, Tog
 import { useAuth } from "../context/AuthContext";
 import {
     MdFavorite, MdFavoriteBorder, MdBookmark, MdBookmarkBorder,
-    MdDelete, MdArrowBack, MdShare, MdCheck, MdChatBubbleOutline
+    MdDelete, MdArrowBack, MdShare, MdCheck, MdChatBubbleOutline, MdVisibility
 } from "react-icons/md";
 
 
@@ -110,7 +110,7 @@ const PostDetails = () => {
     }
 
     const isLiked = post.likes?.includes(user?._id);
-    const isBookmark = user.bookmarks?.includes(id);
+    const isBookmark = user?.bookmarks?.includes(id);
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -170,6 +170,13 @@ const PostDetails = () => {
 
                             {/* Actions */}
                             <div className="flex items-center gap-3">
+                                <span
+                                    className="flex items-center gap-1.5 text-sm"
+                                    style={{ color: 'var(--color-text-muted)' }}
+                                >
+                                    <MdVisibility size={18} />
+                                    <span className="font-medium">{post.views ?? 0}</span>
+                                </span>
                                 {/* Like */}
                                 <button
                                     onClick={toggleLike}

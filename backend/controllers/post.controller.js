@@ -128,8 +128,11 @@ exports.getPost = async (req, res) => {
             return res.status(400).json({ message: "Invalid post id" });
         }
 
-        const post = await Post.findById(id)
-            .populate("author", "name username profile_img");
+        const post = await Post.findByIdAndUpdate(
+            id,
+            { $inc: { views: 1 } },
+            { new: true }
+        ).populate("author", "name username profile_img");
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
         }
