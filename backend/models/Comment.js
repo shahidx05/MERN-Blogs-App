@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const commentSchema = new mongoose.Schema({
     content: {
         type: String,
+        maxlength: 1000,
         required: true,
         trim: true,
     },

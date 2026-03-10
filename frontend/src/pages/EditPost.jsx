@@ -12,6 +12,7 @@ const EditPost = () => {
     const [content, setContent] = useState("");
     const [img, setImg] = useState("");
     const [file, setFile] = useState(null);
+    const [tags, setTags] = useState("");
     const [loading, setLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [error, setError] = useState("");
@@ -28,6 +29,7 @@ const EditPost = () => {
                 setTitle(data.post.title);
                 setContent(data.post.content);
                 setImg(data.post.img);
+                setTags(data.post.tags?.join(", ") || ""); 
             }
         } catch (error) {
             setError("Failed to load post.");
@@ -60,6 +62,7 @@ const EditPost = () => {
             formData.append("title", title);
             formData.append("content", content);
             if (file) formData.append("img", file);
+            formData.append("tags", tags);
 
             const data = await Editpost(formData, id);
             if (data.success) {
@@ -250,6 +253,37 @@ const EditPost = () => {
                             onChange={setContent}
                             placeholder="Write your story..."
                         />
+                    </div>
+
+                    {/* Tags input */}
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Add tags separated by commas  e.g. react, nodejs, webdev"
+                            className="input-field"
+                            value={tags}
+                            onChange={(e) => setTags(e.target.value)}
+                        />
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                            Max 5 tags
+                        </p>
+                        {/* Tag preview */}
+                        {tags && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {tags.split(",").map(t => t.trim()).filter(Boolean).slice(0, 5).map((tag, i) => (
+                                    <span
+                                        key={i}
+                                        className="text-xs px-2 py-0.5 rounded-full"
+                                        style={{
+                                            backgroundColor: 'var(--color-primary-light)',
+                                            color: 'var(--color-primary)'
+                                        }}
+                                    >
+                                        #{tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Buttons */}

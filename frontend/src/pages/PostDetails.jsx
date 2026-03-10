@@ -149,6 +149,24 @@ const PostDetails = () => {
                             {post.title}
                         </h1>
 
+                        {/* Tags */}
+                        {post.tags?.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {post.tags.map((tag, i) => (
+                                    <span
+                                        key={i}
+                                        className="text-xs px-2.5 py-1 rounded-full"
+                                        style={{
+                                            backgroundColor: 'var(--color-primary-light)',
+                                            color: 'var(--color-primary)'
+                                        }}
+                                    >
+                                        #{tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
                         {/* Author row */}
                         <div className="flex items-center justify-between">
                             <Link to={`/user/${post.author.username}`} className="flex items-center gap-3">

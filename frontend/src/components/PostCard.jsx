@@ -93,6 +93,24 @@ const PostCard = ({
           {excerpt.length > 120 ? excerpt.slice(0, 120) + '...' : excerpt}
         </p>
 
+        {/* 👇 Tags */}
+        {post.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {post.tags.slice(0, 3).map((tag, i) => (
+              <span
+                key={i}
+                className="text-xs px-2 py-0.5 rounded-full cursor-pointer hover:opacity-80"
+                style={{
+                  backgroundColor: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)'
+                }}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* ── Footer — always at bottom ── */}
         <div className="mt-auto space-y-3">
 

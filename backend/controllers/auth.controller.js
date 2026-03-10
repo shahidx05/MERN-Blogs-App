@@ -10,14 +10,15 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: "All fields are required" });
         }
 
-        const hash = await bcrypt.hash(req.body.password, 10);
-
+        
         const user = await User.findOne({
             $or: [{ email }, { username }],
         });
         if (user) {
             return res.status(400).json({ message: "User already exists" })
         }
+        
+        const hash = await bcrypt.hash(req.body.password, 10);
 
         const newUser = await User.create({
             name,

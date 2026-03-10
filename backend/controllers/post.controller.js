@@ -6,7 +6,7 @@ const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 exports.getPosts = async (req, res) => {
     try {
-        const { q = "" } = req.query
+        const { q = "", tag = "" } = req.query
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
         const sort = req.query.sort || "latest";
@@ -25,6 +25,10 @@ exports.getPosts = async (req, res) => {
                     { content: { $regex: escaped, $options: "i" } }
                 ]
             };
+        }
+
+        if (tag.trim() !== "") {
+            filter.tags = tag.trim().toLowerCase();
         }
 
         const posts = await Post.find(filter)
@@ -145,12 +149,16 @@ exports.getPost = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, tags } = req.body;
         const userId = req.user.id
 
         if (!title || !content) {
             return res.status(400).json({ message: "All fields are required" })
         }
+
+        const parsedTags = tags
+            ? tags.split(",").map(t => t.trim().toLowerCase()).filter(Boolean).slice(0, 5)
+            : [];
 
         let img = "";
 
@@ -163,6 +171,7 @@ exports.create = async (req, res) => {
             title,
             content,
             img,
+            tags: parsedTags,
             author: userId
         })
 
@@ -199,6 +208,14 @@ exports.edit = async (req, res) => {
 
         if (req.body.title !== undefined) post.title = req.body.title;
         if (req.body.content !== undefined) post.content = req.body.content;
+
+        if (req.body.tags !== undefined) {
+            post.tags = req.body.tags
+                .split(",")
+                .map(t => t.trim().toLowerCase())
+                .filter(Boolean)
+                .slice(0, 5);
+        }
 
         if (req.file) {
             const result = await uploadToCloudinary(req.file.buffer, "posts")

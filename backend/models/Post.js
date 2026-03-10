@@ -28,7 +28,13 @@ const postSchema = new mongoose.Schema({
     views: {
         type: Number,
         default: 0
-    }
+    },
+    tags: [{
+    type: String,
+    trim: true,
+    lowercase: true,
+    maxlength: 20,
+}]
 }, { timestamps: true })
 
 module.exports = mongoose.model("Post", postSchema)
