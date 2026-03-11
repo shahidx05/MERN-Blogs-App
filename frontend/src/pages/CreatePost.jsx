@@ -30,10 +30,16 @@ const CreatePost = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         setError("");
-        if (!title || !content || content === "<p></p>") {
-            setError("Title and content are required.");
+
+        if (!title.trim()) {
+            setError("Title is required.");
             return;
         }
+        if (!content || content === "<p></p>" || content.trim() === "") {
+            setError("Content is required.");
+            return;
+        }
+
         setLoading(true);
         try {
             const formData = new FormData();
@@ -43,14 +49,15 @@ const CreatePost = () => {
             formData.append("tags", tags);
 
             const data = await Createpost(formData);
+
             if (data.success) {
                 navigate("/profile");
             } else {
                 setError(data.message || "Failed to create post.");
             }
-        } catch (error) {
-            setError(error?.response?.data?.message || "Something went wrong.");
-            console.log(error);
+        } catch (err) {
+            setError("Something went wrong. Please try again.");
+            console.log(err);
         } finally {
             setLoading(false);
         }
@@ -74,18 +81,18 @@ const CreatePost = () => {
                     </Link>
                 </div>
 
-                {/* Error */}
+                {/* ✅ Error banner — clearly visible */}
                 {error && (
                     <div
-                        className="flex items-center gap-2 text-sm px-3 py-2.5 rounded-lg"
+                        className="flex items-start gap-2.5 text-sm px-4 py-3 rounded-lg"
                         style={{
                             backgroundColor: 'color-mix(in srgb, var(--color-error) 10%, transparent)',
                             color: 'var(--color-error)',
                             border: '1px solid color-mix(in srgb, var(--color-error) 25%, transparent)',
                         }}
                     >
-                        <MdErrorOutline size={16} />
-                        {error}
+                        <MdErrorOutline size={18} className="flex-shrink-0 mt-0.5" />
+                        <span>{error}</span>
                     </div>
                 )}
 
@@ -100,11 +107,7 @@ const CreatePost = () => {
                 >
                     {preview ? (
                         <div className="relative">
-                            <img
-                                src={preview}
-                                alt="Cover"
-                                className="w-full h-56 object-cover"
-                            />
+                            <img src={preview} alt="Cover" className="w-full h-56 object-cover" />
                             <button
                                 type="button"
                                 onClick={removeImage}
@@ -121,7 +124,7 @@ const CreatePost = () => {
                         >
                             <MdImage size={32} />
                             <span className="text-sm">Click to add a cover image</span>
-                            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>optional</span>
+                            <span className="text-xs">optional · max 2MB</span>
                             <input type="file" accept="image/*" hidden onChange={handleImage} />
                         </label>
                     )}
@@ -139,21 +142,25 @@ const CreatePost = () => {
                     {/* Title */}
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                            Title
+                            Title <span style={{ color: 'var(--color-error)' }}>*</span>
                         </label>
                         <input
                             type="text"
                             placeholder="Your post title..."
                             className="input-field text-base font-medium"
                             value={title}
+                            maxLength={100}
                             onChange={(e) => setTitle(e.target.value)}
                         />
+                        <p className="text-xs text-right" style={{ color: 'var(--color-text-muted)' }}>
+                            {title.length}/100
+                        </p>
                     </div>
 
                     {/* Content */}
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                            Content
+                            Content <span style={{ color: 'var(--color-error)' }}>*</span>
                         </label>
                         <RichTextEditor
                             content={content}
@@ -162,29 +169,28 @@ const CreatePost = () => {
                         />
                     </div>
 
-                    {/* Tags input */}
-                    <div>
+                    {/* Tags */}
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                            Tags
+                        </label>
                         <input
                             type="text"
-                            placeholder="Add tags separated by commas  e.g. react, nodejs, webdev"
+                            placeholder="e.g. react, nodejs, webdev"
                             className="input-field"
                             value={tags}
                             onChange={(e) => setTags(e.target.value)}
                         />
-                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                            Max 5 tags
+                        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            Comma separated · max 5 tags
                         </p>
-                        {/* Tag preview */}
                         {tags && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {tags.split(",").map(t => t.trim()).filter(Boolean).slice(0, 5).map((tag, i) => (
                                     <span
                                         key={i}
                                         className="text-xs px-2 py-0.5 rounded-full"
-                                        style={{
-                                            backgroundColor: 'var(--color-primary-light)',
-                                            color: 'var(--color-primary)'
-                                        }}
+                                        style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
                                     >
                                         #{tag}
                                     </span>
@@ -198,7 +204,7 @@ const CreatePost = () => {
                         <button
                             onClick={submitHandler}
                             disabled={loading}
-                            className="px-6 py-2.5 rounded-lg text-sm font-semibold"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold"
                             style={{
                                 backgroundColor: 'var(--color-primary)',
                                 color: 'var(--color-text-inverse)',

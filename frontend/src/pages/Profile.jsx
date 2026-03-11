@@ -2,20 +2,25 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMyPosts, DeletePost, Editprofile, ToggleLike, ToggleBookmark } from "../services/api";
-import { MdEdit, MdBookmark, MdAdd, MdCameraAlt } from "react-icons/md";
+import { MdEdit, MdBookmark, MdAdd, MdCameraAlt, MdErrorOutline } from "react-icons/md";
 import PostCard from "../components/PostCard";
 
 const Profile = () => {
   const { user, fetchUserProfile, setUser } = useAuth();
   const [posts, setPosts] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadPosts();
   }, []);
 
   const loadPosts = async () => {
-    const data = await getMyPosts();
-    setPosts(data.posts);
+    try {
+      const data = await getMyPosts();
+      setPosts(data.posts);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const toggleLike = async (id) => {
@@ -23,33 +28,35 @@ const Profile = () => {
       prev.map(post => {
         if (post._id === id) {
           const hasLiked = post.likes.includes(user?._id);
-          const updatedLikes = hasLiked
-            ? post.likes.filter((userId) => userId !== user?._id)
-            : [...post.likes, user?._id];
-          return { ...post, likes: updatedLikes };
+          return {
+            ...post,
+            likes: hasLiked
+              ? post.likes.filter(uid => uid !== user?._id)
+              : [...post.likes, user?._id],
+          };
         }
         return post;
       })
     );
     try {
       await ToggleLike(id);
-    } catch (error) { console.log(error); }
+    } catch (err) { console.log(err); }
   };
 
   const toggleSave = async (id) => {
     try {
       const res = await ToggleBookmark(id);
       if (res.success) setUser({ ...user, bookmarks: res.bookmarks });
-    } catch (error) { console.log(error); }
+    } catch (err) { console.log(err); }
   };
 
   const deletePost = async (id) => {
     try {
       await DeletePost(id);
       loadPosts();
-    } catch (error) {
-      alert("Something went wrong");
-      console.log(error);
+    } catch (err) {
+      setError("Failed to delete post. Please try again.");
+      console.log(err);
     }
   };
 
@@ -61,11 +68,14 @@ const Profile = () => {
       const formData = new FormData();
       formData.append("profile_img", file);
       const data = await Editprofile(formData);
-      if (!data.success) { alert(data.message || "Avatar update failed"); return; }
+      if (!data.success) {
+        setError(data.message || "Avatar update failed");
+        return;
+      }
       await fetchUserProfile();
-    } catch (error) {
-      alert("Something went wrong");
-      console.log(error);
+    } catch (err) {
+      setError("Something went wrong updating your avatar.");
+      console.log(err);
     }
   };
 
@@ -80,6 +90,22 @@ const Profile = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+        {/* ── Error Banner ── */}
+        {error && (
+          <div
+            className="flex items-start gap-2.5 text-sm px-4 py-3 rounded-lg"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--color-error) 10%, transparent)',
+              color: 'var(--color-error)',
+              border: '1px solid color-mix(in srgb, var(--color-error) 25%, transparent)',
+            }}
+          >
+            <MdErrorOutline size={18} className="flex-shrink-0 mt-0.5" />
+            <span className="flex-1">{error}</span>
+            <button onClick={() => setError("")} className="flex-shrink-0 text-xs opacity-70 hover:opacity-100">✕</button>
+          </div>
+        )}
 
         {/* ── Profile Card ── */}
         <div
@@ -203,7 +229,7 @@ const Profile = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {posts.map((post) => (
+              {posts.map(post => (
                 <PostCard
                   key={post._id}
                   post={post}
