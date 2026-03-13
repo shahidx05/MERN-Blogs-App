@@ -233,3 +233,16 @@ export const getBookmarks = async (username) => {
   });
   return res.json();
 }
+
+export const ToggleFollow = async (id) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/users/follow/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  if (!res.ok) throw new Error("Not Found");
+
+  return res.json();
+};

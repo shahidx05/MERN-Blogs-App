@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getUser, getUserPosts, ToggleLike, ToggleBookmark } from '../services/api'
-import { MdCalendarToday } from "react-icons/md";
+import { useAuth } from "../context/AuthContext";
+import { getUser, getUserPosts, ToggleLike, ToggleBookmark, ToggleFollow } from '../services/api'
+import { MdCalendarToday, MdPersonAdd, MdPersonRemove } from "react-icons/md";
 import PostCard from "../components/PostCard";
 
 const PublicProfile = () => {
     const { username } = useParams()
+    const { user: authUser } = useAuth();
     const [user, setUser] = useState(null)
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(true);
 
+    // UI only — no logic yet
+    // const [isFollowing, setIsFollowing] = useState(false);
+
+     const isFollowing = user?.followers?.includes(authUser?._id) || false;
 
     useEffect(() => {
         setPosts([]);
@@ -22,6 +28,7 @@ const PublicProfile = () => {
         try {
             const data = await getUser(username);
             if (data) setUser(data.user);
+            console.log(data)
         } catch (error) {
             alert("Something went wrong");
             console.log(error);
@@ -48,6 +55,16 @@ const PublicProfile = () => {
     }, [user])
 
 
+    const followbtn = async () => {
+        // setIsFollowing(prev => !prev)
+        try {
+            const res = await ToggleFollow(user?._id)
+            console.log(res)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const toggleLike = async (id) => {
         setPosts(prev =>
             prev.map(post => {
@@ -59,10 +76,8 @@ const PublicProfile = () => {
                     return { ...post, likes: updatedLikes };
                 }
                 return post
-            }
-            )
+            })
         );
-
         try {
             await ToggleLike(id)
         } catch (error) {
@@ -87,7 +102,6 @@ const PublicProfile = () => {
             day: "numeric",
             year: "numeric",
         });
-
 
     if (!user) {
         return (
@@ -119,25 +133,49 @@ const PublicProfile = () => {
                     />
 
                     <div className="px-6 pb-6">
+
                         {/* Avatar + stats row */}
-                        <div className="flex items-end justify-between -mt-12 mb-4">
+                        <div className="flex items-end justify-between -mt-12 mb-4 flex-wrap gap-y-3">
                             <img
                                 src={user.profile_img}
                                 alt={user.name}
                                 className="w-24 h-24 rounded-full object-cover border-4"
                                 style={{ borderColor: 'var(--color-bg-card)' }}
                             />
-                            <div
-                                className="text-center px-5 py-2 rounded-xl border"
-                                style={{
-                                    backgroundColor: 'var(--color-bg-input)',
-                                    borderColor: 'var(--color-border)',
-                                }}
-                            >
-                                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                                    {posts.length}
-                                </p>
-                                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
+
+                            {/* ── Stats: Posts · Followers · Following ── */}
+                            <div className="flex items-center gap-2.5">
+
+                                <div
+                                    className="text-center px-4 py-2 rounded-xl border"
+                                    style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                                >
+                                    <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>
+                                        {posts.length}
+                                    </p>
+                                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
+                                </div>
+
+                                <div
+                                    className="text-center px-4 py-2 rounded-xl border"
+                                    style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                                >
+                                    <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>
+                                        {user.followers?.length || 0}
+                                    </p>
+                                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Followers</p>
+                                </div>
+
+                                <div
+                                    className="text-center px-4 py-2 rounded-xl border"
+                                    style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                                >
+                                    <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>
+                                        {user.following?.length || 0}
+                                    </p>
+                                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Following</p>
+                                </div>
+
                             </div>
                         </div>
 
@@ -163,6 +201,29 @@ const PublicProfile = () => {
                                 <span className="text-xs">Joined {formatDate(user.createdAt)}</span>
                             </div>
                         )}
+
+                        {/* ── Follow Button ── */}
+                        <div className="mt-5">
+                            <button
+                                onClick={followbtn}
+                                className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold border transition-all"
+                                style={isFollowing ? {
+                                    backgroundColor: 'var(--color-bg-input)',
+                                    color: 'var(--color-text-secondary)',
+                                    borderColor: 'var(--color-border)',
+                                } : {
+                                    backgroundColor: 'var(--color-primary)',
+                                    color: 'var(--color-text-inverse)',
+                                    borderColor: 'var(--color-primary)',
+                                }}
+                            >
+                                {isFollowing
+                                    ? <><MdPersonRemove size={17} /> Unfollow</>
+                                    : <><MdPersonAdd size={17} /> Follow</>
+                                }
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 
