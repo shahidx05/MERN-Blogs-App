@@ -7,15 +7,13 @@ import PostCard from "../components/PostCard";
 
 const PublicProfile = () => {
     const { username } = useParams()
-    const { user: authUser } = useAuth();
+    const { user: authUser, setUser: setAuthUser } = useAuth();
     const [user, setUser] = useState(null)
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(true);
+    const [followLoading, setFollowLoading] = useState(false);
 
-    // UI only — no logic yet
-    // const [isFollowing, setIsFollowing] = useState(false);
-
-     const isFollowing = user?.followers?.includes(authUser?._id) || false;
+    const isFollowing = user?.followers?.includes(authUser?._id) || false;
 
     useEffect(() => {
         setPosts([]);
@@ -28,7 +26,6 @@ const PublicProfile = () => {
         try {
             const data = await getUser(username);
             if (data) setUser(data.user);
-            console.log(data)
         } catch (error) {
             alert("Something went wrong");
             console.log(error);
@@ -56,23 +53,33 @@ const PublicProfile = () => {
 
 
     const followbtn = async () => {
-        // setIsFollowing(prev => !prev)
+        if (!authUser) return;
+        setFollowLoading(true);
         try {
-            const res = await ToggleFollow(user?._id)
-            console.log(res)
+            const res = await ToggleFollow(user._id);
+            if (res.success) {
+                setUser(prev => ({
+                    ...prev,
+                    followers: res.following
+                        ? [...prev.followers, authUser._id]
+                        : prev.followers.filter(id => id !== authUser._id)
+                }));
+            }
         } catch (error) {
-            console.log(error)
+            console.log(error);
+        } finally {
+            setFollowLoading(false);
         }
-    }
+    };
 
     const toggleLike = async (id) => {
         setPosts(prev =>
             prev.map(post => {
                 if (post._id === id) {
-                    const hasLiked = post.likes.includes(user?._id)
+                    const hasLiked = post.likes.includes(authUser?._id)
                     const updatedLikes = hasLiked
-                        ? post.likes.filter((userId) => userId !== user?._id)
-                        : [...post.likes, user?._id];
+                        ? post.likes.filter((userId) => userId !== authUser?._id)
+                        : [...post.likes, authUser?._id];
                     return { ...post, likes: updatedLikes };
                 }
                 return post
@@ -89,10 +96,10 @@ const PublicProfile = () => {
         try {
             const res = await ToggleBookmark(id);
             if (res.success) {
-                setUser({ ...user, bookmarks: res.bookmarks });
+                setAuthUser(prev => ({ ...prev, bookmarks: res.bookmarks }));
             }
         } catch (error) {
-            console.log("Error bookmarking post:", error);
+            console.log(error);
         }
     }
 
@@ -203,27 +210,33 @@ const PublicProfile = () => {
                         )}
 
                         {/* ── Follow Button ── */}
-                        <div className="mt-5">
-                            <button
-                                onClick={followbtn}
-                                className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold border transition-all"
-                                style={isFollowing ? {
-                                    backgroundColor: 'var(--color-bg-input)',
-                                    color: 'var(--color-text-secondary)',
-                                    borderColor: 'var(--color-border)',
-                                } : {
-                                    backgroundColor: 'var(--color-primary)',
-                                    color: 'var(--color-text-inverse)',
-                                    borderColor: 'var(--color-primary)',
-                                }}
-                            >
-                                {isFollowing
-                                    ? <><MdPersonRemove size={17} /> Unfollow</>
-                                    : <><MdPersonAdd size={17} /> Follow</>
-                                }
-                            </button>
-                        </div>
-
+                        {authUser?._id !== user._id && (
+                            <div className="mt-5">
+                                <button
+                                    onClick={followbtn}
+                                    disabled={followLoading}
+                                    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold border transition-all"
+                                    style={isFollowing ? {
+                                        backgroundColor: 'var(--color-bg-input)',
+                                        color: 'var(--color-text-secondary)',
+                                        borderColor: 'var(--color-border)',
+                                        opacity: followLoading ? 0.6 : 1,
+                                        cursor: followLoading ? 'not-allowed' : 'pointer',
+                                    } : {
+                                        backgroundColor: 'var(--color-primary)',
+                                        color: 'var(--color-text-inverse)',
+                                        borderColor: 'var(--color-primary)',
+                                        opacity: followLoading ? 0.6 : 1,
+                                        cursor: followLoading ? 'not-allowed' : 'pointer',
+                                    }}
+                                >
+                                    {isFollowing
+                                        ? <><MdPersonRemove size={17} /> {followLoading ? 'Updating...' : 'Unfollow'}</>
+                                        : <><MdPersonAdd size={17} /> {followLoading ? 'Updating...' : 'Follow'}</>
+                                    }
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -252,10 +265,10 @@ const PublicProfile = () => {
                                 <PostCard
                                     key={post._id}
                                     post={post}
-                                    currentUserId={user._id}
-                                    bookmarks={user.bookmarks}
-                                    onLike={toggleLike}
-                                    onBookmark={toggleSave}
+                                    currentUserId={authUser?._id}
+                                    bookmarks={authUser?.bookmarks}
+                                    onLike={authUser ? toggleLike : undefined}
+                                    onBookmark={authUser ? toggleSave : undefined}
                                 />
                             ))}
                         </div>

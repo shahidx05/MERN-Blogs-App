@@ -116,15 +116,14 @@ const Profile = () => {
             boxShadow: 'var(--shadow-card)',
           }}
         >
-          {/* Banner */}
           <div
             className="h-28 w-full"
             style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%)' }}
           />
 
           <div className="px-6 pb-6">
-            {/* Avatar row */}
-            <div className="flex items-end justify-between -mt-12 mb-4">
+            {/* Avatar + stats row */}
+            <div className="flex items-end justify-between -mt-12 mb-4 flex-wrap gap-y-3">
               <div className="relative">
                 <img
                   src={user.profile_img}
@@ -142,13 +141,29 @@ const Profile = () => {
                 </label>
               </div>
 
-              {/* Post count */}
-              <div
-                className="text-center px-5 py-2 rounded-xl border"
-                style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
-              >
-                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{posts.length}</p>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
+              {/* ── Stats: Posts · Followers · Following ── */}
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="text-center px-4 py-2 rounded-xl border"
+                  style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                >
+                  <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{posts.length}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
+                </div>
+                <div
+                  className="text-center px-4 py-2 rounded-xl border"
+                  style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                >
+                  <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{user.followers?.length ?? 0}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Followers</p>
+                </div>
+                <div
+                  className="text-center px-4 py-2 rounded-xl border"
+                  style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
+                >
+                  <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{user.following?.length ?? 0}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Following</p>
+                </div>
               </div>
             </div>
 
