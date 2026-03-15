@@ -246,3 +246,12 @@ export const ToggleFollow = async (id) => {
 
   return res.json();
 };
+
+export const getFollowingPosts = async (page = 1, limit = 10) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API}/posts/following?page=${page}&limit=${limit}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error("Failed");
+    return res.json();
+};

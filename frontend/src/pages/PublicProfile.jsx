@@ -26,6 +26,7 @@ const PublicProfile = () => {
         try {
             const data = await getUser(username);
             if (data) setUser(data.user);
+            console.log(data)
         } catch (error) {
             alert("Something went wrong");
             console.log(error);
@@ -63,6 +64,13 @@ const PublicProfile = () => {
                     followers: res.following
                         ? [...prev.followers, authUser._id]
                         : prev.followers.filter(id => id !== authUser._id)
+                }));
+                
+                setAuthUser(prev => ({
+                    ...prev,
+                    following: res.following
+                        ? [...prev.following, user._id]
+                        : prev.following.filter(id => id !== user._id)
                 }));
             }
         } catch (error) {
