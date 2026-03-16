@@ -255,3 +255,19 @@ export const getFollowingPosts = async (page = 1, limit = 10) => {
     if (!res.ok) throw new Error("Failed");
     return res.json();
 };
+
+export const getFollowers = async (username) => {
+  const res = await fetch(`${API}/users/${username}/followers`, {
+    headers: { "Content-Type": "application/json" }
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
+};
+
+export const getFollowing = async (username) => {
+  const res = await fetch(`${API}/users/${username}/following`, {
+    headers: { "Content-Type": "application/json" }
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
+};

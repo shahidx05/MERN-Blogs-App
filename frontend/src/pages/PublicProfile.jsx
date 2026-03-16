@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { getUser, getUserPosts, ToggleLike, ToggleBookmark, ToggleFollow } from '../services/api'
 import { MdCalendarToday, MdPersonAdd, MdPersonRemove } from "react-icons/md";
 import PostCard from "../components/PostCard";
+import FollowModal from "../components/FollowModal";
 
 const PublicProfile = () => {
     const { username } = useParams()
@@ -12,6 +13,7 @@ const PublicProfile = () => {
     const [posts, setPosts] = useState([])
     const [loading, setLoading] = useState(true);
     const [followLoading, setFollowLoading] = useState(false);
+    const [modal, setModal] = useState(null);
 
     const isFollowing = user?.followers?.includes(authUser?._id) || false;
 
@@ -26,9 +28,7 @@ const PublicProfile = () => {
         try {
             const data = await getUser(username);
             if (data) setUser(data.user);
-            console.log(data)
         } catch (error) {
-            alert("Something went wrong");
             console.log(error);
         }
     };
@@ -65,7 +65,7 @@ const PublicProfile = () => {
                         ? [...prev.followers, authUser._id]
                         : prev.followers.filter(id => id !== authUser._id)
                 }));
-                
+
                 setAuthUser(prev => ({
                     ...prev,
                     following: res.following
@@ -128,6 +128,16 @@ const PublicProfile = () => {
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+
+            {/* ── Modal ── */}
+            {modal && (
+                <FollowModal
+                    username={username}
+                    type={modal}
+                    onClose={() => setModal(null)}
+                />
+            )}
+
             <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
                 {/* ── Profile Card ── */}
@@ -139,17 +149,14 @@ const PublicProfile = () => {
                         boxShadow: 'var(--shadow-card)',
                     }}
                 >
-                    {/* Banner */}
                     <div
                         className="h-28 w-full"
-                        style={{
-                            background: 'linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%)',
-                        }}
+                        style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%)' }}
                     />
 
                     <div className="px-6 pb-6">
 
-                        {/* Avatar + stats row */}
+                        {/* Avatar + stats */}
                         <div className="flex items-end justify-between -mt-12 mb-4 flex-wrap gap-y-3">
                             <img
                                 src={user.profile_img}
@@ -158,9 +165,9 @@ const PublicProfile = () => {
                                 style={{ borderColor: 'var(--color-bg-card)' }}
                             />
 
-                            {/* ── Stats: Posts · Followers · Following ── */}
                             <div className="flex items-center gap-2.5">
 
+                                {/* Posts — not clickable */}
                                 <div
                                     className="text-center px-4 py-2 rounded-xl border"
                                     style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
@@ -171,25 +178,29 @@ const PublicProfile = () => {
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
                                 </div>
 
-                                <div
-                                    className="text-center px-4 py-2 rounded-xl border"
+                                {/* Followers — clickable */}
+                                <button
+                                    onClick={() => setModal('followers')}
+                                    className="text-center px-4 py-2 rounded-xl border hover:opacity-75 transition-opacity"
                                     style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
                                 >
                                     <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>
                                         {user.followers?.length || 0}
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Followers</p>
-                                </div>
+                                </button>
 
-                                <div
-                                    className="text-center px-4 py-2 rounded-xl border"
+                                {/* Following — clickable */}
+                                <button
+                                    onClick={() => setModal('following')}
+                                    className="text-center px-4 py-2 rounded-xl border hover:opacity-75 transition-opacity"
                                     style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
                                 >
                                     <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>
                                         {user.following?.length || 0}
                                     </p>
                                     <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Following</p>
-                                </div>
+                                </button>
 
                             </div>
                         </div>
@@ -209,7 +220,7 @@ const PublicProfile = () => {
                             </p>
                         )}
 
-                        {/* Joined date */}
+                        {/* Joined */}
                         {user.createdAt && (
                             <div className="flex items-center gap-1.5 mt-3" style={{ color: 'var(--color-text-muted)' }}>
                                 <MdCalendarToday size={13} />
@@ -217,7 +228,7 @@ const PublicProfile = () => {
                             </div>
                         )}
 
-                        {/* ── Follow Button ── */}
+                        {/* Follow Button */}
                         {authUser?._id !== user._id && (
                             <div className="mt-5">
                                 <button
@@ -248,7 +259,7 @@ const PublicProfile = () => {
                     </div>
                 </div>
 
-                {/* ── Posts Section ── */}
+                {/* ── Posts ── */}
                 <div>
                     <h3 className="text-base font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                         Posts by {user.name}
@@ -269,7 +280,7 @@ const PublicProfile = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {posts.map((post) => (
+                            {posts.map(post => (
                                 <PostCard
                                     key={post._id}
                                     post={post}

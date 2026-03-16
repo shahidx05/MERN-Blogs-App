@@ -4,11 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { getMyPosts, DeletePost, Editprofile, ToggleLike, ToggleBookmark } from "../services/api";
 import { MdEdit, MdBookmark, MdAdd, MdCameraAlt, MdErrorOutline } from "react-icons/md";
 import PostCard from "../components/PostCard";
+import FollowModal from "../components/FollowModal";
 
 const Profile = () => {
   const { user, fetchUserProfile, setUser } = useAuth();
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState("");
+  const [modal, setModal] = useState(null);
 
   useEffect(() => {
     loadPosts();
@@ -89,8 +91,18 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+ 
+      {/* ── Modal ── */}
+      {modal && (
+        <FollowModal
+          username={user.username}
+          type={modal}
+          onClose={() => setModal(null)}
+        />
+      )}
+ 
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-
+ 
         {/* ── Error Banner ── */}
         {error && (
           <div
@@ -106,7 +118,7 @@ const Profile = () => {
             <button onClick={() => setError("")} className="flex-shrink-0 text-xs opacity-70 hover:opacity-100">✕</button>
           </div>
         )}
-
+ 
         {/* ── Profile Card ── */}
         <div
           className="rounded-2xl border overflow-hidden"
@@ -120,9 +132,9 @@ const Profile = () => {
             className="h-28 w-full"
             style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%)' }}
           />
-
+ 
           <div className="px-6 pb-6">
-            {/* Avatar + stats row */}
+            {/* Avatar + stats */}
             <div className="flex items-end justify-between -mt-12 mb-4 flex-wrap gap-y-3">
               <div className="relative">
                 <img
@@ -140,9 +152,11 @@ const Profile = () => {
                   <input type="file" accept="image/*" hidden onChange={handleAvatarChange} />
                 </label>
               </div>
-
-              {/* ── Stats: Posts · Followers · Following ── */}
+ 
+              {/* Stats */}
               <div className="flex items-center gap-2.5">
+ 
+                {/* Posts — not clickable */}
                 <div
                   className="text-center px-4 py-2 rounded-xl border"
                   style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
@@ -150,28 +164,35 @@ const Profile = () => {
                   <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{posts.length}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Posts</p>
                 </div>
-                <div
-                  className="text-center px-4 py-2 rounded-xl border"
+ 
+                {/* Followers — clickable */}
+                <button
+                  onClick={() => setModal('followers')}
+                  className="text-center px-4 py-2 rounded-xl border hover:opacity-75 transition-opacity"
                   style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
                 >
                   <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{user.followers?.length ?? 0}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Followers</p>
-                </div>
-                <div
-                  className="text-center px-4 py-2 rounded-xl border"
+                </button>
+ 
+                {/* Following — clickable */}
+                <button
+                  onClick={() => setModal('following')}
+                  className="text-center px-4 py-2 rounded-xl border hover:opacity-75 transition-opacity"
                   style={{ backgroundColor: 'var(--color-bg-input)', borderColor: 'var(--color-border)' }}
                 >
                   <p className="text-lg font-bold leading-none" style={{ color: 'var(--color-text-primary)' }}>{user.following?.length ?? 0}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Following</p>
-                </div>
+                </button>
+ 
               </div>
             </div>
-
+ 
             {/* Info */}
             <h2 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{user.name}</h2>
             <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>@{user.username}</p>
             <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{user.email}</p>
-
+ 
             {user.bio ? (
               <p className="text-sm mt-3 leading-relaxed max-w-lg" style={{ color: 'var(--color-text-secondary)' }}>
                 {user.bio}
@@ -184,7 +205,7 @@ const Profile = () => {
                 </Link>
               </p>
             )}
-
+ 
             {/* Buttons */}
             <div className="flex gap-3 mt-5 flex-wrap">
               <Link
@@ -212,7 +233,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-
+ 
         {/* ── My Posts ── */}
         <div>
           <div className="flex items-center justify-between mb-4">
@@ -227,7 +248,7 @@ const Profile = () => {
               <MdAdd size={16} /> New Post
             </Link>
           </div>
-
+ 
           {posts.length === 0 ? (
             <div
               className="rounded-xl border py-14 text-center"
@@ -259,10 +280,10 @@ const Profile = () => {
             </div>
           )}
         </div>
-
+ 
       </div>
     </div>
   );
 };
-
+ 
 export default Profile;
