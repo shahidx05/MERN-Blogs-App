@@ -12,6 +12,7 @@ import PublicProfile from './pages/PublicProfile';
 import EditProfile from './pages/EditProfile';
 import Bookmarks from './pages/Bookmarks';
 import NotFound from './pages/NotFound';
+import Footer from './components/Footer';
 
 const App = () => {
 
@@ -34,6 +35,7 @@ const App = () => {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer/>
     </>
   )
 }
