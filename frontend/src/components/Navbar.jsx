@@ -22,9 +22,11 @@ const Navbar = () => {
   }
 
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+
   const toggleDark = () => {
-    document.documentElement.classList.toggle('dark');
-    setDark((prev) => !prev);
+    const isDark = document.documentElement.classList.toggle('dark');
+    setDark(isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   };
 
   const [menuOpen, setMenuOpen] = useState(false);

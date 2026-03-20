@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
@@ -15,6 +16,12 @@ import NotFound from './pages/NotFound';
 import Footer from './components/Footer';
 
 const App = () => {
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
 
   return (
     <>
@@ -35,7 +42,7 @@ const App = () => {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </>
   )
 }
