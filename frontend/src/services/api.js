@@ -271,3 +271,17 @@ export const getFollowing = async (username) => {
   if (!res.ok) throw new Error("Failed");
   return res.json();
 };
+
+export const generatePostContent = async (title) => {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API}/ai/generate`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ title }),
+    });
+    if (!res.ok) throw new Error("Failed");
+    return res.json();
+};
