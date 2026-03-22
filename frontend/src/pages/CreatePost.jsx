@@ -222,4 +222,4 @@ const CreatePost = () => {
     );
 };
 
-export default CreatePost;git
+export default CreatePost;
