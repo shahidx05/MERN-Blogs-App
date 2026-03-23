@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Createpost } from "../services/api";
+import { Createpost, generatePostContent } from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
-import { MdImage, MdClose, MdErrorOutline } from "react-icons/md";
+import { MdImage, MdClose, MdErrorOutline, MdAutoAwesome } from "react-icons/md";
 import RichTextEditor from "../components/RichTextEditor";
 
 const CreatePost = () => {
@@ -11,6 +11,7 @@ const CreatePost = () => {
     const [preview, setPreview] = useState(null);
     const [tags, setTags] = useState("");
     const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -25,6 +26,28 @@ const CreatePost = () => {
     const removeImage = () => {
         setImg(null);
         setPreview(null);
+    };
+
+    const handleGenerate = async () => {
+        if (!title.trim()) {
+            setError("Please enter a title first to generate content.");
+            return;
+        }
+        setError("");
+        setAiLoading(true);
+        try {
+            const data = await generatePostContent(title);
+            if (data.success) {
+                setContent(data.content);
+            } else {
+                setError(data.message || "Failed to generate content.");
+            }
+        } catch (err) {
+            setError("AI generation failed. Please try again.");
+            console.log(err);
+        } finally {
+            setAiLoading(false);
+        }
     };
 
     const submitHandler = async (e) => {
@@ -63,10 +86,11 @@ const CreatePost = () => {
         }
     };
 
+   
     return (
         <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
             <div className="max-w-3xl mx-auto px-4 py-8 space-y-5">
-
+ 
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
@@ -80,8 +104,8 @@ const CreatePost = () => {
                         ← Cancel
                     </Link>
                 </div>
-
-                {/* ✅ Error banner — clearly visible */}
+ 
+                {/* Error banner */}
                 {error && (
                     <div
                         className="flex items-start gap-2.5 text-sm px-4 py-3 rounded-lg"
@@ -95,7 +119,7 @@ const CreatePost = () => {
                         <span>{error}</span>
                     </div>
                 )}
-
+ 
                 {/* Cover Image */}
                 <div
                     className="rounded-2xl border overflow-hidden"
@@ -129,7 +153,7 @@ const CreatePost = () => {
                         </label>
                     )}
                 </div>
-
+ 
                 {/* Form */}
                 <div
                     className="rounded-2xl border p-6 space-y-5"
@@ -156,19 +180,52 @@ const CreatePost = () => {
                             {title.length}/100
                         </p>
                     </div>
-
+ 
                     {/* Content */}
                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                            Content <span style={{ color: 'var(--color-error)' }}>*</span>
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                                Content <span style={{ color: 'var(--color-error)' }}>*</span>
+                            </label>
+ 
+                            {/* ── AI Generate Button ── */}
+                            <button
+                                type="button"
+                                onClick={handleGenerate}
+                                disabled={aiLoading || !title.trim()}
+                                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all"
+                                style={{
+                                    backgroundColor: aiLoading ? 'var(--color-bg-input)' : 'color-mix(in srgb, var(--color-primary) 10%, transparent)',
+                                    color: 'var(--color-primary)',
+                                    borderColor: 'color-mix(in srgb, var(--color-primary) 30%, transparent)',
+                                    opacity: (!title.trim() || aiLoading) ? 0.6 : 1,
+                                    cursor: (!title.trim() || aiLoading) ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                {aiLoading ? (
+                                    <>
+                                        <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <MdAutoAwesome size={14} />
+                                        Generate with AI
+                                    </>
+                                )}
+                            </button>
+                        </div>
+ 
                         <RichTextEditor
                             content={content}
                             onChange={setContent}
-                            placeholder="Write your story..."
+                            placeholder="Write your story or click 'Generate with AI'..."
                         />
                     </div>
-
+ 
                     {/* Tags */}
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
@@ -198,7 +255,7 @@ const CreatePost = () => {
                             </div>
                         )}
                     </div>
-
+ 
                     {/* Submit */}
                     <div className="flex justify-end pt-1">
                         <button
@@ -212,14 +269,22 @@ const CreatePost = () => {
                                 cursor: loading ? 'not-allowed' : 'pointer',
                             }}
                         >
-                            {loading ? 'Publishing...' : 'Publish Post'}
+                            {loading ? (
+                                <>
+                                    <svg className="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                    </svg>
+                                    Publishing...
+                                </>
+                            ) : 'Publish Post'}
                         </button>
                     </div>
                 </div>
-
+ 
             </div>
         </div>
     );
 };
-
+ 
 export default CreatePost;

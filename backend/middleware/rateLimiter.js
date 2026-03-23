@@ -57,6 +57,6 @@ module.exports = { apiLimiter, loginLimiter, registerLimiter, postLimiter, comme
 
 exports.aiLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 100,                   // 10 AI generations per hour per IP
+    max: 10,                   // 10 AI generations per hour per IP
     message: { success: false, message: "Too many AI requests, try again later" }
 });
