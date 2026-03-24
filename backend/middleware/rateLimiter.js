@@ -30,24 +30,24 @@ const registerLimiter = rateLimit({
 
 
 const postLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 15,
-    message: {
-        message: "Too many posts created. Try again later."
-    }
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 15,
+  message: {
+    message: "Too many posts created. Try again later."
+  }
 });
 
 const commentLimiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 50,
-    message: {
-        message: "Too many comments. Please slow down."
-    }
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 50,
+  message: {
+    message: "Too many comments. Please slow down."
+  }
 });
 
 const likeLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 100,
+  max: 3,
   message: {
     message: "Too many likes. Slow down."
   }
@@ -56,7 +56,7 @@ const likeLimiter = rateLimit({
 module.exports = { apiLimiter, loginLimiter, registerLimiter, postLimiter, commentLimiter, likeLimiter };
 
 exports.aiLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 10,                   // 10 AI generations per hour per IP
-    message: { success: false, message: "Too many AI requests, try again later" }
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,                   // 10 AI generations per hour per IP
+  message: { success: false, message: "Too many AI requests, try again later" }
 });

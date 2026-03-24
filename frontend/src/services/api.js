@@ -156,16 +156,24 @@ export const getUserPosts = async (id) => {
 }
 
 export const ToggleLike = async (id) => {
-  const token = localStorage.getItem("token");
-  const res = await fetch(`${API}/posts/like/${id}`, {
-    method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-  if (!res.ok) throw new Error("Not Found");
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API}/posts/like/${id}`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` }
+    });
 
-  return res.json();
+    // ✅ parse response first
+    const data = await res.json();
+
+    if (res.status === 429) {
+        // throw with special message so UI can catch it
+        const err = new Error("Rate limited");
+        err.status = 429;
+        throw err;
+    }
+
+    if (!res.ok) throw new Error("Failed");
+    return data;
 };
 
 export const getPostComments = async (id, page=1, limit=5) => {

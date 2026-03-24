@@ -56,26 +56,47 @@ const Home = () => {
     setActiveTab(tab);
   };
 
-  const toggleLike = async (id) => {
-    setPosts((prev) =>
-      prev.map((post) => {
+const [rateMsg, setRateMsg] = useState("");
+
+const toggleLike = async (id) => {
+    // optimistic update
+    setPosts(prev => prev.map(post => {
         if (post._id === id) {
-          const hasLiked = post.likes.includes(user?._id);
-          const updatedLikes = hasLiked
-            ? post.likes.filter((userId) => userId !== user?._id)
-            : [...post.likes, user?._id];
-          return { ...post, likes: updatedLikes };
+            const hasLiked = post.likes.includes(user?._id);
+            return {
+                ...post,
+                likes: hasLiked
+                    ? post.likes.filter(uid => uid !== user?._id)
+                    : [...post.likes, user?._id],
+            };
         }
         return post;
-      })
-    );
-    try {
-      await ToggleLike(id);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    }));
 
+    try {
+        await ToggleLike(id);
+    } catch (error) {
+        // ✅ revert
+        setPosts(prev => prev.map(post => {
+            if (post._id === id) {
+                const hasLiked = post.likes.includes(user?._id);
+                return {
+                    ...post,
+                    likes: hasLiked
+                        ? post.likes.filter(uid => uid !== user?._id)
+                        : [...post.likes, user?._id],
+                };
+            }
+            return post;
+        }));
+
+        // ✅ show message if rate limited
+        if (error.status === 429) {
+            setRateMsg("Too many likes! Slow down a bit 😅");
+            setTimeout(() => setRateMsg(""), 3000);
+        }
+    }
+};
  const toggleSave = async (id) => {
     try {
       const res = await ToggleBookmark(id);
@@ -104,8 +125,25 @@ const Home = () => {
     </div>
   );
 
-  return (
+return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg)" }}>
+      
+      {/* ── Fixed Toast Notification for Rate Limiting ── */}
+      {rateMsg && (
+        <div
+          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 text-sm px-6 py-3 rounded-full shadow-lg font-medium transition-all duration-300"
+          style={{
+            // Added a solid background fallback so it doesn't blend into posts behind it
+            backgroundColor: 'var(--color-bg-card)', 
+            color: 'var(--color-warning)',
+            border: '1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)',
+            boxShadow: '0 10px 25px -5px color-mix(in srgb, var(--color-warning) 20%, transparent)'
+          }}
+        >
+          {rateMsg}
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
 
         {/* ── Tabs ── */}
