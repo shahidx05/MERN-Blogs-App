@@ -11,6 +11,9 @@ const cors = require("cors");
 const app = express()
 const port = process.env.PORT || 4000
 
+// Trust the reverse proxy (Render) so rate limiting uses the correct IP
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true

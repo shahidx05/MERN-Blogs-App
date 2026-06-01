@@ -112,7 +112,13 @@ const LinkPopup = ({ onConfirm, onClose }) => {
 };
 
 // ── Main Editor ──
-const RichTextEditor = ({ content = '', onChange, placeholder = 'Write your story...' }) => {
+const RichTextEditor = ({
+    content = '',
+    onChange,
+    placeholder = 'Write your story...',
+    externalContent = null,
+    onExternalApplied = null
+}) => {
     const [showLinkPopup, setShowLinkPopup] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [wordCount, setWordCount] = useState(0);
@@ -138,10 +144,19 @@ const RichTextEditor = ({ content = '', onChange, placeholder = 'Write your stor
 
     // ── Fix: sync content when loaded async (EditPost) ──
     useEffect(() => {
-        if (editor && content && editor.isEmpty) {
+        // Prevent setContent from resetting history when user clears the editor
+        if (editor && content && editor.isEmpty && content !== editor.getHTML()) {
             editor.commands.setContent(content);
         }
     }, [content, editor]);
+
+    // ── Handle External Content (e.g., AI Assist) ──
+    useEffect(() => {
+        if (editor && externalContent) {
+            editor.commands.setContent(externalContent);
+            if (onExternalApplied) onExternalApplied();
+        }
+    }, [externalContent, editor, onExternalApplied]);
 
     if (!editor) return null;
 
