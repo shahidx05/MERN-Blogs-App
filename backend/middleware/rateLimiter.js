@@ -2,7 +2,7 @@ const rateLimit = require("express-rate-limit");
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000000, // each IP can make 100 requests
+  max: 500, 
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -13,7 +13,7 @@ const apiLimiter = rateLimit({
 
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 8, // 5 login attempts
+  max: 8,
   message: {
     success: false,
     message: "Too many login attempts. Try again later."
@@ -22,41 +22,44 @@ const loginLimiter = rateLimit({
 
 const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 8,
+  max: 3,
   message: {
+    success: false,
     message: "Too many accounts created. Try again later."
   }
 });
 
-
 const postLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 15,
+  windowMs: 60 * 60 * 1000,
+  max: 10,
   message: {
+    success: false,
     message: "Too many posts created. Try again later."
   }
 });
 
 const commentLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 50,
+  windowMs: 10 * 60 * 1000,
+  max: 15,
   message: {
+    success: false,
     message: "Too many comments. Please slow down."
   }
 });
 
 const likeLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 3,
+  max: 40,
   message: {
+    success: false,
     message: "Too many likes. Slow down."
   }
 });
 
-module.exports = { apiLimiter, loginLimiter, registerLimiter, postLimiter, commentLimiter, likeLimiter };
-
-exports.aiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,                   // 10 AI generations per hour per IP
-  message: { success: false, message: "Too many AI requests, try again later" }
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { success: false, message: "Too many AI requests, try again later." }
 });
+
+module.exports = { apiLimiter, loginLimiter, registerLimiter, postLimiter, commentLimiter, likeLimiter, aiLimiter };

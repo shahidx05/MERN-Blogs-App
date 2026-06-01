@@ -24,55 +24,36 @@ const Login = () => {
             if (data?.token) {
                 navigate('/profile');
             } else {
-                // If your API returns success=false or similar
                 setError('Login failed. Please check your credentials.');
             }
         } catch (err) {
-            // Works if your Login() in AuthContext rethrows the error
-            // Make sure your AuthContext does: throw error  (see note below)
-            const msg =
-                err?.response?.data?.message ||  // axios error
-                err?.message ||                   // generic error
-                'Invalid email or password.';
-            setError(msg);
+            if (err.status === 429) {
+                setError('Login failed. Please check your credentials.');
+            } else {
+                const msg =
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    'Invalid email or password.';
+                setError(msg);
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center px-4"
-            style={{ backgroundColor: 'var(--color-bg)' }}
-        >
-            <div
-                className="w-full max-w-md rounded-2xl p-8 border"
-                style={{
-                    backgroundColor: 'var(--color-bg-card)',
-                    borderColor: 'var(--color-border)',
-                    boxShadow: 'var(--shadow-card)',
-                }}
-            >
+        <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--color-bg)]">
+            <div className="w-full max-w-md rounded-2xl p-8 border bg-[var(--color-bg-card)] border-[var(--color-border)] shadow-[var(--shadow-card)]">
+
                 {/* Header */}
                 <div className="mb-7">
-                    <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                        Sign in
-                    </h2>
-                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                        Welcome back to your blog
-                    </p>
+                    <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">Sign in</h2>
+                    <p className="text-sm mt-1 text-[var(--color-text-muted)]">Welcome back to Blogiary</p>
                 </div>
 
                 {/* Error */}
                 {error && (
-                    <div
-                        className="flex items-center gap-2 text-sm px-3 py-2.5 rounded-lg mb-5"
-                        style={{
-                            backgroundColor: 'color-mix(in srgb, var(--color-error) 10%, transparent)',
-                            color: 'var(--color-error)',
-                            border: '1px solid color-mix(in srgb, var(--color-error) 25%, transparent)',
-                        }}
-                    >
+                    <div className="flex items-center gap-2 text-sm px-3 py-2.5 rounded-lg mb-5 error-surface">
                         <MdErrorOutline size={16} />
                         {error}
                     </div>
@@ -83,14 +64,11 @@ const Login = () => {
 
                     {/* Email */}
                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                            Email
-                        </label>
+                        <label className="text-sm font-medium text-[var(--color-text-secondary)]">Email</label>
                         <div className="relative">
                             <MdEmail
                                 size={16}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                                style={{ color: 'var(--color-text-muted)' }}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-text-muted)]"
                             />
                             <input
                                 type="email"
@@ -105,16 +83,11 @@ const Login = () => {
 
                     {/* Password */}
                     <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                                Password
-                            </label>
-                        </div>
+                        <label className="text-sm font-medium text-[var(--color-text-secondary)]">Password</label>
                         <div className="relative">
                             <MdLock
                                 size={16}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                                style={{ color: 'var(--color-text-muted)' }}
+                                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-text-muted)]"
                             />
                             <input
                                 type={showPassword ? 'text' : 'password'}
@@ -127,13 +100,9 @@ const Login = () => {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2"
-                                style={{ color: 'var(--color-text-muted)' }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
                             >
-                                {showPassword
-                                    ? <MdVisibilityOff size={16} />
-                                    : <MdVisibility size={16} />
-                                }
+                                {showPassword ? <MdVisibilityOff size={16} /> : <MdVisibility size={16} />}
                             </button>
                         </div>
                     </div>
@@ -142,26 +111,16 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-2.5 rounded-lg font-semibold text-sm mt-1"
-                        style={{
-                            backgroundColor: 'var(--color-primary)',
-                            color: 'var(--color-text-inverse)',
-                            opacity: loading ? 0.7 : 1,
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                        }}
+                        className="btn-primary w-full py-2.5 justify-center text-sm mt-1 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Signing in...' : 'Sign in'}
                     </button>
                 </form>
 
                 {/* Footer */}
-                <p className="text-sm text-center mt-6" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="text-sm text-center mt-6 text-[var(--color-text-secondary)]">
                     Don't have an account?{' '}
-                    <Link
-                        to="/register"
-                        className="font-semibold hover:underline"
-                        style={{ color: 'var(--color-primary)' }}
-                    >
+                    <Link to="/register" className="font-semibold hover:underline text-[var(--color-primary)]">
                         Register
                     </Link>
                 </p>

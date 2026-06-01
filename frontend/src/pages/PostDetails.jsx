@@ -1,43 +1,49 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getPost, ToggleLike, getPostComments, CreateComment, DeleteComment, ToggleBookmark } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import {
     MdFavorite, MdFavoriteBorder, MdBookmark, MdBookmarkBorder,
-    MdDelete, MdArrowBack, MdShare, MdCheck, MdChatBubbleOutline, MdVisibility
+    MdDelete, MdArrowBack, MdShare, MdCheck, MdChatBubbleOutline, MdVisibility,
+    MdEdit
 } from "react-icons/md";
+import RateLimitModal from "../components/RateLimitModal";
+import PageLoader from "../components/PageLoader";
+import BackButton from "../components/BackButton";
 
 
 const PostDetails = () => {
     const { user, setUser } = useAuth();
     const { id } = useParams();
+    const navigate = useNavigate();
     const [post, setPost] = useState(null);
     const [comments, setComments] = useState([]);
-    const [content, setContent] = useState('');
+    const [content, setContent] = useState("");
     const [myComment, setMycomment] = useState(false);
     const [sortType, setSortType] = useState("latest");
     const [copied, setCopied] = useState(false);
     const [commentPage, setCommentPage] = useState(1);
     const [hasMoreComments, setHasMoreComments] = useState(false);
     const [commentLoading, setCommentLoading] = useState(false);
-
+    const [rateLimitMsg, setRateLimitMsg] = useState("");
 
     const loadPost = async () => {
         try {
             const data = await getPost(id);
             setPost(data.post);
-        } catch (error) { console.log(error); }
+        } catch (error) { /* silently handle */ }
     };
+
     const loadComments = async (page = 1) => {
         try {
             setCommentLoading(true);
             const res = await getPostComments(id, page, 5);
             if (res) {
-                setComments(prev => page === 1 ? res.comments : [...prev, ...res.comments]);
+                setComments((prev) => (page === 1 ? res.comments : [...prev, ...res.comments]));
                 setHasMoreComments(res.hasMore);
                 setCommentPage(page);
             }
-        } catch (error) { console.log(error); }
+        } catch (error) { /* silently handle */ }
         finally { setCommentLoading(false); }
     };
 
@@ -50,14 +56,18 @@ const PostDetails = () => {
         try {
             await ToggleLike(id);
             loadPost();
-        } catch (error) { console.log(error); }
+        } catch (error) {
+            if (error.status === 429) {
+                setRateLimitMsg("Too many likes! Slow down a bit.");
+            }
+        }
     };
 
     const toggleSave = async () => {
         try {
             const res = await ToggleBookmark(id);
             if (res.success) setUser({ ...user, bookmarks: res.bookmarks });
-        } catch (error) { console.log(error); }
+        } catch (error) { /* silently handle */ }
     };
 
     const handleShare = () => {
@@ -70,37 +80,36 @@ const PostDetails = () => {
         try {
             if (!content.trim()) return;
             const res = await CreateComment(id, content);
-            if (res) { loadComments(); setContent(''); }
-        } catch (error) { console.log(error); }
+            if (res) { loadComments(); setContent(""); }
+        } catch (error) {
+            if (error.status === 429) {
+                setRateLimitMsg("Too many comments! Please slow down.");
+            }
+        }
     };
 
     const handleDeleteComment = async (commentId) => {
         try {
             await DeleteComment(commentId);
             loadComments();
-        } catch (error) { console.log(error); }
+        } catch (error) { /* silently handle */ }
     };
-
 
     const formatDate = (date) =>
         new Date(date).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
+            month: "short", day: "numeric", year: "numeric",
         });
 
     if (!post) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading post...</p>
-            </div>
+            <PageLoader text="Loading post..." />
         );
     }
 
-    let filteredComments = [...comments]
+    let filteredComments = [...comments];
 
     filteredComments = myComment
-        ? filteredComments.filter(c => c.author._id === user?._id)
+        ? filteredComments.filter((c) => c.author._id === user?._id)
         : filteredComments;
 
     if (sortType === "latest") {
@@ -113,184 +122,153 @@ const PostDetails = () => {
     const isBookmark = user?.bookmarks?.includes(id);
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="min-h-screen bg-[var(--color-bg)]">
+            <RateLimitModal
+                isOpen={!!rateLimitMsg}
+                onClose={() => setRateLimitMsg("")}
+                message={rateLimitMsg}
+            />
             <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
-                {/* ── Back ── */}
-                <Link
-                    to="/"
-                    className="inline-flex items-center gap-1.5 text-sm hover:underline"
-                    style={{ color: 'var(--color-text-muted)' }}
-                >
-                    <MdArrowBack size={16} /> Back to Home
-                </Link>
+                {/* Back */}
+                <div className="flex justify-end">
+                    <BackButton onClick={() => navigate("/home")} />
+                </div>
 
-                {/* ── Post Card ── */}
-                <div
-                    className="rounded-2xl border overflow-hidden"
-                    style={{
-                        backgroundColor: 'var(--color-bg-card)',
-                        borderColor: 'var(--color-border)',
-                        boxShadow: 'var(--shadow-card)',
-                    }}
-                >
+                {/* Post Card */}
+                <div className="card rounded-2xl border overflow-hidden">
                     {/* Cover Image */}
                     {post.img && (
                         <img
                             src={post.img}
                             alt={post.title}
-                            className="w-full h-72 object-cover"
+                            className="w-full aspect-video object-cover"
                         />
                     )}
 
                     <div className="p-6 space-y-5">
                         {/* Title */}
-                        <h1 className="text-2xl font-bold leading-snug" style={{ color: 'var(--color-text-primary)' }}>
+                        <h1 className="text-2xl font-bold leading-snug text-[var(--color-text-primary)]">
                             {post.title}
                         </h1>
 
-                        {/* Tags */}
+                        {/* Tags — clickable */}
                         {post.tags?.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                                 {post.tags.map((tag, i) => (
-                                    <span
-                                        key={i}
-                                        className="text-xs px-2.5 py-1 rounded-full"
-                                        style={{
-                                            backgroundColor: 'var(--color-primary-light)',
-                                            color: 'var(--color-primary)'
-                                        }}
-                                    >
+                                    <Link key={i} to={`/home?tag=${tag}`} className="tag">
                                         #{tag}
-                                    </span>
+                                    </Link>
                                 ))}
                             </div>
                         )}
 
                         {/* Author row */}
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
                             <Link to={`/user/${post.author.username}`} className="flex items-center gap-3">
                                 <img
                                     src={post.author.profile_img}
                                     alt={post.author.username}
-                                    className="w-10 h-10 rounded-full object-cover border"
-                                    style={{ borderColor: 'var(--color-border)' }}
+                                    className="w-10 h-10 rounded-full object-cover border border-[var(--color-border)]"
                                 />
                                 <div>
-                                    <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                                    <p className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors">
                                         {post.author.username}
                                     </p>
-                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    <p className="text-xs text-[var(--color-text-muted)]">
                                         {formatDate(post.createdAt)}
                                     </p>
                                 </div>
                             </Link>
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-3">
-                                <span
-                                    className="flex items-center gap-1.5 text-sm"
-                                    style={{ color: 'var(--color-text-muted)' }}
-                                >
+                            {/* Action buttons */}
+                            <div className="flex items-center gap-3 flex-wrap">
+                                <span className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
                                     <MdVisibility size={18} />
                                     <span className="font-medium">{post.views ?? 0}</span>
                                 </span>
-                                {/* Like */}
+
                                 <button
                                     onClick={toggleLike}
-                                    className="flex items-center gap-1.5 text-sm transition-colors"
-                                    style={{ color: isLiked ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
+                                    className={`flex items-center gap-1.5 text-sm transition-colors ${isLiked ? "text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-accent)]"}`}
                                 >
                                     {isLiked ? <MdFavorite size={20} /> : <MdFavoriteBorder size={20} />}
                                     <span className="font-medium">{post.likes.length}</span>
                                 </button>
 
-                                {/* Bookmark */}
                                 <button
                                     onClick={toggleSave}
-                                    className="transition-colors"
-                                    title={isBookmark ? 'Unsave' : 'Save'}
-                                    style={{ color: isBookmark ? 'var(--color-primary)' : 'var(--color-text-muted)' }}
+                                    className={`transition-colors ${isBookmark ? "text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]" : "text-[var(--color-text-muted)] hover:text-[var(--color-primary)]"}`}
+                                    title={isBookmark ? "Unsave" : "Save"}
                                 >
                                     {isBookmark ? <MdBookmark size={20} /> : <MdBookmarkBorder size={20} />}
                                 </button>
 
-                                {/* Share */}
                                 <button
                                     onClick={handleShare}
-                                    className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
-                                    style={{
-                                        borderColor: copied ? 'var(--color-success)' : 'var(--color-border)',
-                                        color: copied ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                                        backgroundColor: 'var(--color-bg-input)',
-                                    }}
+                                    className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors bg-[var(--color-bg-input)] ${
+                                        copied
+                                            ? "border-[var(--color-success)] text-[var(--color-success)] hover:bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]"
+                                            : "border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                                    }`}
                                 >
                                     {copied ? <MdCheck size={15} /> : <MdShare size={15} />}
-                                    {copied ? 'Copied!' : 'Share'}
+                                    {copied ? "Copied!" : "Share"}
                                 </button>
+
+                                {/* Edit post — only author */}
+                                {user?._id === post.author._id && (
+                                    <button
+                                        onClick={() => navigate(`/edit-post/${post._id}`)}
+                                        className="btn-success-outline"
+                                    >
+                                        <MdEdit size={13} /> Edit
+                                    </button>
+                                )}
                             </div>
                         </div>
 
                         {/* Divider */}
-                        <div className="h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+                        <div className="h-px bg-[var(--color-border)]" />
 
-                        {/* Content — rendered as HTML from rich text editor */}
+                        {/* Post content — rich text */}
                         <div
-                            className="rte-content"
-                            style={{ color: 'var(--color-text-primary)', fontSize: '0.95rem', lineHeight: '1.8' }}
+                            className="prose-content"
                             dangerouslySetInnerHTML={{ __html: post.content }}
                         />
                     </div>
                 </div>
 
-                {/* ── Comments Section ── */}
-                <div
-                    className="rounded-2xl border p-6 space-y-5"
-                    style={{
-                        backgroundColor: 'var(--color-bg-card)',
-                        borderColor: 'var(--color-border)',
-                        boxShadow: 'var(--shadow-card)',
-                    }}
-                >
+                {/* Comments Section */}
+                <div className="card rounded-2xl border p-6 space-y-5">
                     {/* Header */}
                     <div className="flex items-center justify-between flex-wrap gap-3">
                         <div className="flex items-center gap-2">
-                            <MdChatBubbleOutline size={18} style={{ color: 'var(--color-primary)' }} />
-                            <h2 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                            <MdChatBubbleOutline size={18} className="text-[var(--color-primary)]" />
+                            <h2 className="text-base font-semibold text-[var(--color-text-primary)]">
                                 Comments
                             </h2>
-                            <span
-                                className="text-xs font-medium px-2 py-0.5 rounded-full"
-                                style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-                            >
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)]">
                                 {filteredComments.length}
                             </span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {/* My Comments toggle */}
                             <button
-                                onClick={() => setMycomment(prev => !prev)}
-                                className="text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors"
-                                style={{
-                                    backgroundColor: myComment ? 'var(--color-primary)' : 'var(--color-bg-input)',
-                                    color: myComment ? 'var(--color-text-inverse)' : 'var(--color-text-secondary)',
-                                    borderColor: myComment ? 'var(--color-primary)' : 'var(--color-border)',
-                                }}
+                                onClick={() => setMycomment((prev) => !prev)}
+                                className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+                                    myComment
+                                        ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] border-[var(--color-primary)]"
+                                        : "bg-[var(--color-bg-input)] text-[var(--color-text-secondary)] border-[var(--color-border)]"
+                                }`}
                             >
                                 My Comments
                             </button>
 
-                            {/* Sort */}
                             <select
                                 value={sortType}
                                 onChange={(e) => setSortType(e.target.value)}
-                                className="text-xs px-2.5 py-1.5 rounded-lg border outline-none"
-                                style={{
-                                    backgroundColor: 'var(--color-bg-input)',
-                                    borderColor: 'var(--color-border)',
-                                    color: 'var(--color-text-secondary)',
-                                }}
+                                className="text-xs px-2.5 py-1.5 rounded-lg border outline-none bg-[var(--color-bg-input)] border-[var(--color-border)] text-[var(--color-text-secondary)]"
                             >
                                 <option value="latest">Latest</option>
                                 <option value="oldest">Oldest</option>
@@ -314,25 +292,24 @@ const PostDetails = () => {
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                     onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                        if (e.key === "Enter" && !e.shiftKey) {
                                             e.preventDefault();
                                             handlePostComment();
                                         }
                                     }}
                                 />
                                 <div className="flex items-center justify-between">
-                                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    <p className="text-xs text-[var(--color-text-muted)]">
                                         Press Enter to post
                                     </p>
                                     <button
                                         onClick={handlePostComment}
                                         disabled={!content.trim()}
-                                        className="text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors"
-                                        style={{
-                                            backgroundColor: content.trim() ? 'var(--color-primary)' : 'var(--color-bg-input)',
-                                            color: content.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                                            cursor: content.trim() ? 'pointer' : 'not-allowed',
-                                        }}
+                                        className={`text-sm font-semibold px-4 py-1.5 rounded-lg transition-colors ${
+                                            content.trim()
+                                                ? "bg-[var(--color-primary)] text-[var(--color-text-inverse)] cursor-pointer"
+                                                : "bg-[var(--color-bg-input)] text-[var(--color-text-muted)] cursor-not-allowed"
+                                        }`}
                                     >
                                         Post
                                     </button>
@@ -342,11 +319,11 @@ const PostDetails = () => {
                     )}
 
                     {/* Divider */}
-                    <div className="h-px" style={{ backgroundColor: 'var(--color-border)' }} />
+                    <div className="h-px bg-[var(--color-border)]" />
 
                     {/* Comments List */}
                     {filteredComments.length === 0 ? (
-                        <div className="flex flex-col items-center py-10 gap-2" style={{ color: 'var(--color-text-muted)' }}>
+                        <div className="flex flex-col items-center py-10 gap-2 text-[var(--color-text-muted)]">
                             <MdChatBubbleOutline size={28} />
                             <p className="text-sm">No comments yet</p>
                             <p className="text-xs">Be the first to comment</p>
@@ -364,41 +341,34 @@ const PostDetails = () => {
                                             className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5"
                                         />
                                         <div
-                                            className="flex-1 rounded-xl px-4 py-3"
-                                            style={{
-                                                backgroundColor: isOwn ? 'var(--color-primary-light)' : 'var(--color-bg-input)',
-                                                border: `1px solid ${isOwn ? 'color-mix(in srgb, var(--color-primary) 25%, transparent)' : 'var(--color-border)'}`,
-                                            }}
+                                            className={`flex-1 rounded-xl px-4 py-3 border ${
+                                                isOwn
+                                                    ? "bg-[var(--color-primary-light)] border-[color-mix(in_srgb,var(--color-primary)_25%,transparent)]"
+                                                    : "bg-[var(--color-bg-input)] border-[var(--color-border)]"
+                                            }`}
                                         >
                                             <div className="flex items-center justify-between mb-1">
                                                 <div className="flex items-center gap-2">
                                                     <Link
                                                         to={`/user/${c.author.username}`}
-                                                        className="text-xs font-semibold hover:underline"
-                                                        style={{ color: 'var(--color-text-primary)' }}
+                                                        className="text-xs font-semibold hover:underline text-[var(--color-text-primary)]"
                                                     >
                                                         {c.author.username}
                                                     </Link>
                                                     {isOwn && (
-                                                        <span
-                                                            className="text-xs px-1.5 py-0.5 rounded-full font-medium"
-                                                            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
-                                                        >
+                                                        <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-[var(--color-primary)] text-[var(--color-text-inverse)]">
                                                             you
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                                    <span className="text-xs text-[var(--color-text-muted)]">
                                                         {formatDate(c.createdAt)}
                                                     </span>
                                                     {canDelete && (
                                                         <button
                                                             onClick={() => handleDeleteComment(c._id)}
-                                                            className="p-1 rounded-full transition-colors"
-                                                            style={{ color: 'var(--color-text-muted)' }}
-                                                            onMouseEnter={e => e.currentTarget.style.color = 'var(--color-error)'}
-                                                            onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-muted)'}
+                                                            className="p-1 rounded-full transition-colors text-[var(--color-text-muted)] hover:text-[var(--color-error)]"
                                                             title="Delete"
                                                         >
                                                             <MdDelete size={14} />
@@ -406,7 +376,7 @@ const PostDetails = () => {
                                                     )}
                                                 </div>
                                             </div>
-                                            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                                            <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                                 {c.content}
                                             </p>
                                         </div>
@@ -416,19 +386,13 @@ const PostDetails = () => {
                         </div>
                     )}
 
-                    {/* Load more */}
+                    {/* Load more comments */}
                     {hasMoreComments && (
                         <div className="flex justify-center pt-2">
                             <button
                                 onClick={() => loadComments(commentPage + 1)}
                                 disabled={commentLoading}
-                                className="text-sm px-5 py-2 rounded-lg border"
-                                style={{
-                                    borderColor: 'var(--color-border)',
-                                    color: 'var(--color-text-secondary)',
-                                    backgroundColor: 'var(--color-bg-input)',
-                                    opacity: commentLoading ? 0.6 : 1,
-                                }}
+                                className="btn-ghost text-sm px-5 py-2 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 {commentLoading ? "Loading..." : "Load more comments"}
                             </button>

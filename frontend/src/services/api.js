@@ -9,7 +9,18 @@ export const register = async (name, username, email, password) => {
     body: JSON.stringify({ name, username, email, password }),
   });
 
-  return res.json();
+  const data = await res.json();
+  if (res.status === 429) {
+    const err = new Error("Rate limited");
+    err.status = 429;
+    throw err;
+  }
+  if (!res.ok) {
+    const err = new Error(data.message || "Registration failed");
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 };
 
 export const login = async (email, password) => {
@@ -21,7 +32,18 @@ export const login = async (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 
-  return res.json();
+  const data = await res.json();
+  if (res.status === 429) {
+    const err = new Error("Rate limited");
+    err.status = 429;
+    throw err;
+  }
+  if (!res.ok) {
+    const err = new Error(data.message || "Login failed");
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 };
 
 export const getMe = async () => {
@@ -38,8 +60,11 @@ export const getMe = async () => {
   return res.json();
 };
 
-export const getAllPosts = async (page=1, limit=10, q="") => {
-  const res = await fetch(`${API}/posts?page=${page}&limit=${limit}&q=${q}`);
+export const getAllPosts = async (page = 1, limit = 10, q = "", tag = "") => {
+  const params = new URLSearchParams({ page, limit });
+  if (q) params.set("q", q);
+  if (tag) params.set("tag", tag);
+  const res = await fetch(`${API}/posts?${params.toString()}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch posts");
@@ -156,27 +181,27 @@ export const getUserPosts = async (id) => {
 }
 
 export const ToggleLike = async (id) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API}/posts/like/${id}`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` }
-    });
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts/like/${id}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }
+  });
 
-    // ✅ parse response first
-    const data = await res.json();
+  // ✅ parse response first
+  const data = await res.json();
 
-    if (res.status === 429) {
-        // throw with special message so UI can catch it
-        const err = new Error("Rate limited");
-        err.status = 429;
-        throw err;
-    }
+  if (res.status === 429) {
+    // throw with special message so UI can catch it
+    const err = new Error("Rate limited");
+    err.status = 429;
+    throw err;
+  }
 
-    if (!res.ok) throw new Error("Failed");
-    return data;
+  if (!res.ok) throw new Error("Failed");
+  return data;
 };
 
-export const getPostComments = async (id, page=1, limit=5) => {
+export const getPostComments = async (id, page = 1, limit = 5) => {
   const res = await fetch(`${API}/comments/${id}?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: {
@@ -197,10 +222,21 @@ export const CreateComment = async (id, content) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({content}),
+    body: JSON.stringify({ content }),
   });
 
-  return res.json();
+  const data = await res.json();
+  if (res.status === 429) {
+    const err = new Error("Rate limited");
+    err.status = 429;
+    throw err;
+  }
+  if (!res.ok) {
+    const err = new Error(data.message || "Failed to post comment");
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 };
 
 export const DeleteComment = async (id) => {
@@ -236,7 +272,7 @@ export const getBookmarks = async (username) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` 
+      "Authorization": `Bearer ${token}`
     }
   });
   return res.json();
@@ -256,12 +292,12 @@ export const ToggleFollow = async (id) => {
 };
 
 export const getFollowingPosts = async (page = 1, limit = 10) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API}/posts/following?page=${page}&limit=${limit}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error("Failed");
-    return res.json();
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/posts/following?page=${page}&limit=${limit}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
 };
 
 export const getFollowers = async (username) => {
@@ -280,16 +316,30 @@ export const getFollowing = async (username) => {
   return res.json();
 };
 
-export const generatePostContent = async (title) => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API}/ai/generate`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ title }),
-    });
-    if (!res.ok) throw new Error("Failed");
-    return res.json();
+export const aiAssist = async (action, payload = {}) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API}/ai/${action}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload),
+  });
+
+  return res.json();
+};
+
+export const searchUsers = async (q) => {
+  const res = await fetch(`${API}/users/search?q=${encodeURIComponent(q)}`, {
+    headers: { "Content-Type": "application/json" }
+  });
+  if (!res.ok) throw new Error("Failed");
+  return res.json();
+};
+
+export const getAllPostsByTag = async (tag, page = 1, limit = 10) => {
+  const res = await fetch(`${API}/posts?page=${page}&limit=${limit}&tag=${encodeURIComponent(tag)}`);
+  if (!res.ok) throw new Error("Failed to fetch posts");
+  return res.json();
 };

@@ -121,36 +121,35 @@ exports.Follow = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid user id" });
         }
 
-        const [target, me] = await Promise.all([
-            User.findById(targetId),
-            User.findById(myId)
-        ]);
+        const target = await User.findById(targetId).select("followers");
 
         if (!target) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        const isFollowing = me.following.includes(targetId);
+        const isFollowing = target.followers.some(id => id.toString() === myId);
 
         if (isFollowing) {
-            me.following.pull(targetId);
-            target.followers.pull(myId);
+            await Promise.all([
+                User.findByIdAndUpdate(myId, { $pull: { following: targetId } }),
+                User.findByIdAndUpdate(targetId, { $pull: { followers: myId } })
+            ]);
         } else {
-            me.following.push(targetId);
-            target.followers.push(myId);
+            await Promise.all([
+                User.findByIdAndUpdate(myId, { $addToSet: { following: targetId } }),
+                User.findByIdAndUpdate(targetId, { $addToSet: { followers: myId } })
+            ]);
         }
 
-        await target.save()
-        await me.save()
+        const updated = await User.findById(targetId).select("followers");
+        const updatedMe = await User.findById(myId).select("following");
 
         res.status(200).json({
             success: true,
-            message: isFollowing
-                ? "User unfollowed"
-                : "User followed",
+            message: isFollowing ? "User unfollowed" : "User followed",
             following: !isFollowing,
-            followersCount: target.followers.length,
-            followingCount: me.following.length
+            followersCount: updated.followers.length,
+            followingCount: updatedMe.following.length
         })
 
     }
@@ -197,6 +196,34 @@ exports.getUserFollowing = async (req, res) => {
             count: user.following.length,
             following: user.following,
         });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+exports.searchUsers = async (req, res) => {
+    try {
+        const { q = "" } = req.query;
+
+        if (!q.trim()) {
+            return res.status(400).json({ success: false, message: "Search query is required" });
+        }
+
+        // Escape special regex characters from user input
+        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, "i");
+
+        const users = await User.find({
+            $or: [
+                { name: regex },
+                { username: regex }
+            ]
+        })
+            .select("_id name username profile_img bio")
+            .limit(10);
+
+        res.status(200).json({ success: true, users });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

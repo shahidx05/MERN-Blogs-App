@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Landing from './pages/Landing';
+import About from './pages/About';
 import Profile from './pages/Profile';
 import CreatePost from './pages/CreatePost';
 import EditPost from './pages/EditPost';
@@ -27,8 +29,9 @@ const App = () => {
     <>
       <Navbar />
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/search' element={<Home />} />
+        <Route path='/' element={<Landing />} />
+        <Route path='/home' element={<Home />} />
+        <Route path='/about' element={<About />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
         <Route path='/post/:id' element={<PostDetails />} />

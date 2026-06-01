@@ -3,6 +3,21 @@ const User = require('../models/User')
 const Comment = require('../models/Comment')
 const mongoose = require('mongoose')
 const uploadToCloudinary = require("../utils/cloudinaryUpload");
+const sanitizeHtml = require("sanitize-html");
+
+const ALLOWED_TAGS = [
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "p", "ul", "ol", "li",
+    "strong", "em", "b", "i", "s",
+    "code", "pre", "blockquote",
+    "a", "br"
+];
+
+const ALLOWED_ATTRIBUTES = {
+    a: ["href", "target", "rel"]
+};
+
+const sanitize = (html) => sanitizeHtml(html, { allowedTags: ALLOWED_TAGS, allowedAttributes: ALLOWED_ATTRIBUTES });
 
 exports.getPosts = async (req, res) => {
     try {
@@ -217,7 +232,7 @@ exports.create = async (req, res) => {
 
         const post = await Post.create({
             title,
-            content,
+            content: sanitize(content),
             img,
             tags: parsedTags,
             author: userId
@@ -255,7 +270,7 @@ exports.edit = async (req, res) => {
         }
 
         if (req.body.title !== undefined) post.title = req.body.title;
-        if (req.body.content !== undefined) post.content = req.body.content;
+        if (req.body.content !== undefined) post.content = sanitize(req.body.content);
 
         if (req.body.tags !== undefined) {
             post.tags = req.body.tags

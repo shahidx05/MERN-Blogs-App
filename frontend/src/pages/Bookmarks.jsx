@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getBookmarks, ToggleBookmark, ToggleLike } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { MdBookmark } from "react-icons/md";
 import PostCard from "../components/PostCard";
+import RateLimitModal from "../components/RateLimitModal";
+import BackButton from "../components/BackButton";
+import PageLoader from "../components/PageLoader";
 
 const Bookmarks = () => {
     const { user, setUser } = useAuth();
+    const navigate = useNavigate();
     const [posts, setPosts] = useState([]);
+    const [rateLimitMsg, setRateLimitMsg] = useState("");
 
     const loadPosts = async () => {
         if (!user?.username) return;
@@ -38,7 +44,21 @@ const Bookmarks = () => {
         try {
             await ToggleLike(id);
         } catch (error) {
-            console.log(error);
+            setPosts(prev =>
+                prev.map(post => {
+                    if (post._id === id) {
+                        const hasLiked = post.likes.includes(user?._id);
+                        const updatedLikes = hasLiked
+                            ? post.likes.filter((userId) => userId !== user?._id)
+                            : [...post.likes, user?._id];
+                        return { ...post, likes: updatedLikes };
+                    }
+                    return post;
+                })
+            );
+            if (error.status === 429) {
+                setRateLimitMsg("Too many likes! Slow down a bit.");
+            }
         }
     };
 
@@ -55,49 +75,43 @@ const Bookmarks = () => {
     };
 
     if (!user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-            </div>
-        );
+        return <PageLoader />;
     }
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="min-h-screen bg-[var(--color-bg)]">
+            {/* Rate limit modal */}
+            <RateLimitModal
+                isOpen={!!rateLimitMsg}
+                onClose={() => setRateLimitMsg("")}
+                message={rateLimitMsg}
+            />
             <div className="max-w-6xl mx-auto px-4 py-8">
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
-                        <MdBookmark size={22} style={{ color: 'var(--color-primary)' }} />
-                        <h1 className="text-xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                        <MdBookmark size={22} className="text-[var(--color-primary)]" />
+                        <h1 className="text-xl font-bold text-[var(--color-text-primary)]">
                             Saved Posts
                         </h1>
                         {posts.length > 0 && (
-                            <span
-                                className="text-xs font-medium px-2 py-0.5 rounded-full"
-                                style={{
-                                    backgroundColor: 'var(--color-primary-light)',
-                                    color: 'var(--color-primary)',
-                                }}
-                            >
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)]">
                                 {posts.length}
                             </span>
                         )}
                     </div>
+                    <BackButton />
                 </div>
 
                 {/* Empty state */}
                 {posts.length === 0 ? (
-                    <div
-                        className="rounded-xl border py-20 text-center"
-                        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-card)' }}
-                    >
-                        <MdBookmark size={36} className="mx-auto mb-3" style={{ color: 'var(--color-text-muted)' }} />
-                        <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                    <div className="rounded-xl border py-20 text-center border-[var(--color-border)] bg-[var(--color-bg-card)]">
+                        <MdBookmark size={36} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
+                        <p className="text-sm font-medium text-[var(--color-text-secondary)]">
                             No saved posts yet
                         </p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                        <p className="text-xs mt-1 text-[var(--color-text-muted)]">
                             Posts you bookmark will appear here
                         </p>
                     </div>

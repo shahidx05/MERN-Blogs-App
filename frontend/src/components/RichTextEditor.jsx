@@ -173,21 +173,14 @@ const RichTextEditor = ({ content = '', onChange, placeholder = 'Write your stor
             )}
 
             <div
-                className="rounded-xl border overflow-hidden transition-colors"
+                className="rounded-xl border overflow-hidden transition-colors bg-[var(--color-bg-card)]"
                 style={{
                     borderColor: isFocused ? 'var(--color-border-focus)' : 'var(--color-border)',
-                    backgroundColor: 'var(--color-bg-card)',
                     boxShadow: isFocused ? '0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent)' : 'none',
                 }}
             >
                 {/* ── Toolbar ── */}
-                <div
-                    className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b"
-                    style={{
-                        borderColor: 'var(--color-border)',
-                        backgroundColor: 'var(--color-bg-input)',
-                    }}
-                >
+                <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-[var(--color-border)] bg-[var(--color-bg-input)]">
                     {/* Text formatting */}
                     <ToolbarBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold (Ctrl+B)">
                         <MdFormatBold size={18} />
@@ -265,11 +258,8 @@ const RichTextEditor = ({ content = '', onChange, placeholder = 'Write your stor
                 <EditorContent editor={editor} className="rte-content" />
 
                 {/* ── Footer: word count ── */}
-                <div
-                    className="px-4 py-1.5 border-t flex justify-end"
-                    style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-input)' }}
-                >
-                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                <div className="px-4 py-1.5 border-t flex justify-end border-[var(--color-border)] bg-[var(--color-bg-input)]">
+                    <span className="text-xs text-[var(--color-text-muted)]">
                         {wordCount} {wordCount === 1 ? 'word' : 'words'}
                     </span>
                 </div>

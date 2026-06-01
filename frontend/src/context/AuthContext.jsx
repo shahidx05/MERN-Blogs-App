@@ -31,16 +31,12 @@ export const AuthProvider = ({ children }) => {
 
 
     const Register = async (name, username, email, password) => {
-        try {
-            const data = await register(name, username, email, password)
-            if (data.token) {
-                localStorage.setItem("token", data.token);
-                setToken(data.token);
-            }
-            return data
-        } catch (error) {
-            console.log(error)
+        const data = await register(name, username, email, password)
+        if (data.token) {
+            localStorage.setItem("token", data.token);
+            setToken(data.token);
         }
+        return data
     }
 
     const Login = async (email, password) => {

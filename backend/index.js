@@ -28,9 +28,9 @@ app.use("/api/comments", commentRoutes);
 app.use('/api/ai', aiRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Welcome to Blogs API')
+  res.send('Welcome to Blogify API')
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Blogify server listening on port ${port}`)
 })

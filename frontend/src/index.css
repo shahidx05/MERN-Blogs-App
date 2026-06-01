@@ -1,131 +1,151 @@
 @import "tailwindcss";
 /* ============================================================
-   🎨 SOCIAL BLOG APP — COLOR SYSTEM
+   🎨 SOCIAL BLOG APP - COLOR SYSTEM
    All colors are defined here as CSS variables.
    To change the theme, just update values below.
    ============================================================ */
 
 @layer base {
 
-  /* ─────────────────────────────────────────
+  /* -----------------------------------------
      ☀️  LIGHT MODE (default)
-  ───────────────────────────────────────── */
+  ----------------------------------------- */
   :root {
     /* Brand / Primary */
-    --color-primary:         #6366F1;   /* Indigo — buttons, links, highlights */
-    --color-primary-hover:   #4F46E5;   /* Darker indigo on hover */
-    --color-primary-light:   #EEF2FF;   /* Soft indigo bg (badges, chips) */
+    --color-primary: #6366F1;
+    /* Indigo - buttons, links, highlights */
+    --color-primary-hover: #4F46E5;
+    /* Darker indigo on hover */
+    --color-primary-light: #EEF2FF;
+    /* Soft indigo bg (badges, chips) */
 
     /* Accent */
-    --color-accent:          #F43F5E;   /* Rose — likes, alerts, notifications */
-    --color-accent-hover:    #E11D48;
+    --color-accent: #F43F5E;
+    /* Rose - likes, alerts, notifications */
+    --color-accent-hover: #E11D48;
 
     /* Success / Warning / Error */
-    --color-success:         #22C55E;
-    --color-warning:         #F59E0B;
-    --color-error:           #EF4444;
+    --color-success: #16a34a;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
 
     /* Backgrounds */
-    --color-bg:              #F9FAFB;   /* App background */
-    --color-bg-card:         #FFFFFF;   /* Card / post background */
-    --color-bg-input:        #F3F4F6;   /* Input fields */
-    --color-bg-hover:        #F3F4F6;   /* Hover state on items */
-    --color-bg-overlay:      rgba(0,0,0,0.4); /* Modal overlay */
+    --color-bg: #F9FAFB;
+    /* App background */
+    --color-bg-card: #FFFFFF;
+    /* Card / post background */
+    --color-bg-input: #F3F4F6;
+    /* Input fields */
+    --color-bg-hover: #F3F4F6;
+    /* Hover state on items */
+    --color-bg-overlay: rgba(0, 0, 0, 0.4);
+    /* Modal overlay */
 
     /* Borders */
-    --color-border:          #E5E7EB;   /* Default border */
-    --color-border-focus:    #6366F1;   /* Input focus border */
+    --color-border: #E5E7EB;
+    /* Default border */
+    --color-border-focus: #6366F1;
+    /* Input focus border */
 
     /* Text */
-    --color-text-primary:    #111827;   /* Main headings, body */
-    --color-text-secondary:  #6B7280;   /* Subtitles, metadata */
-    --color-text-muted:      #9CA3AF;   /* Placeholders, timestamps */
-    --color-text-inverse:    #FFFFFF;   /* Text on dark/primary bg */
-    --color-text-link:       #6366F1;   /* Clickable links */
+    --color-text-primary: #111827;
+    /* Main headings, body */
+    --color-text-secondary: #6B7280;
+    /* Subtitles, metadata */
+    --color-text-muted: #9CA3AF;
+    /* Placeholders, timestamps */
+    --color-text-inverse: #FFFFFF;
+    /* Text on dark/primary bg */
+    --color-text-link: #6366F1;
+    /* Clickable links */
 
     /* Sidebar / Navbar */
-    --color-nav-bg:          #FFFFFF;
-    --color-nav-border:      #E5E7EB;
-    --color-nav-text:        #374151;
-    --color-nav-active:      #6366F1;
-    --color-nav-active-bg:   #EEF2FF;
+    --color-nav-bg: #FFFFFF;
+    --color-nav-border: #E5E7EB;
+    --color-nav-text: #374151;
+    --color-nav-active: #6366F1;
+    --color-nav-active-bg: #EEF2FF;
 
     /* Avatar placeholder */
-    --color-avatar-bg:       #C7D2FE;
-    --color-avatar-text:     #4338CA;
+    --color-avatar-bg: #C7D2FE;
+    --color-avatar-text: #4338CA;
 
     /* Tag / Badge */
-    --color-tag-bg:          #E0E7FF;
-    --color-tag-text:        #4338CA;
+    --color-tag-bg: #E0E7FF;
+    --color-tag-text: #4338CA;
 
     /* Scrollbar */
-    --color-scrollbar:       #D1D5DB;
+    --color-scrollbar: #D1D5DB;
     --color-scrollbar-thumb: #9CA3AF;
 
     /* Shadow */
-    --shadow-card:           0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-dropdown:       0 10px 15px -3px rgba(0,0,0,0.1);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
-  /* ─────────────────────────────────────────
+  /* -----------------------------------------
      🌙  DARK MODE
      Applied when <html class="dark"> is set
-  ───────────────────────────────────────── */
+  ----------------------------------------- */
   .dark {
     /* Brand / Primary */
-    --color-primary:         #818CF8;   /* Lighter indigo for dark bg */
-    --color-primary-hover:   #6366F1;
-    --color-primary-light:   #1E1B4B;
+    --color-primary: #818CF8;
+    /* Lighter indigo for dark bg */
+    --color-primary-hover: #6366F1;
+    --color-primary-light: #1E1B4B;
 
     /* Accent */
-    --color-accent:          #FB7185;
-    --color-accent-hover:    #F43F5E;
+    --color-accent: #FB7185;
+    --color-accent-hover: #F43F5E;
 
     /* Success / Warning / Error */
-    --color-success:         #4ADE80;
-    --color-warning:         #FCD34D;
-    --color-error:           #F87171;
+    --color-success: #4ADE80;
+    --color-warning: #FCD34D;
+    --color-error: #F87171;
 
     /* Backgrounds */
-    --color-bg:              #0F172A;   /* App background — deep navy */
-    --color-bg-card:         #1E293B;   /* Card background — slate */
-    --color-bg-input:        #334155;   /* Input background */
-    --color-bg-hover:        #334155;
-    --color-bg-overlay:      rgba(0,0,0,0.6);
+    --color-bg: #0F172A;
+    /* App background - deep navy */
+    --color-bg-card: #1E293B;
+    /* Card background - slate */
+    --color-bg-input: #334155;
+    /* Input background */
+    --color-bg-hover: #334155;
+    --color-bg-overlay: rgba(0, 0, 0, 0.6);
 
     /* Borders */
-    --color-border:          #334155;
-    --color-border-focus:    #818CF8;
+    --color-border: #334155;
+    --color-border-focus: #818CF8;
 
     /* Text */
-    --color-text-primary:    #F1F5F9;
-    --color-text-secondary:  #94A3B8;
-    --color-text-muted:      #64748B;
-    --color-text-inverse:    #0F172A;
-    --color-text-link:       #818CF8;
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+    --color-text-inverse: #0F172A;
+    --color-text-link: #818CF8;
 
     /* Sidebar / Navbar */
-    --color-nav-bg:          #1E293B;
-    --color-nav-border:      #334155;
-    --color-nav-text:        #CBD5E1;
-    --color-nav-active:      #818CF8;
-    --color-nav-active-bg:   #1E1B4B;
+    --color-nav-bg: #1E293B;
+    --color-nav-border: #334155;
+    --color-nav-text: #CBD5E1;
+    --color-nav-active: #818CF8;
+    --color-nav-active-bg: #1E1B4B;
 
     /* Avatar placeholder */
-    --color-avatar-bg:       #312E81;
-    --color-avatar-text:     #C7D2FE;
+    --color-avatar-bg: #312E81;
+    --color-avatar-text: #C7D2FE;
 
     /* Tag / Badge */
-    --color-tag-bg:          #1E1B4B;
-    --color-tag-text:        #A5B4FC;
+    --color-tag-bg: #1E1B4B;
+    --color-tag-text: #A5B4FC;
 
     /* Scrollbar */
-    --color-scrollbar:       #1E293B;
+    --color-scrollbar: #1E293B;
     --color-scrollbar-thumb: #475569;
 
     /* Shadow */
-    --shadow-card:           0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-    --shadow-dropdown:       0 10px 15px -3px rgba(0,0,0,0.5);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -136,134 +156,314 @@
 
 @layer components {
 
-  /* ── Backgrounds ── */
-  .bg-app          { background-color: var(--color-bg); }
-  .bg-card         { background-color: var(--color-bg-card); }
-  .bg-input-c      { background-color: var(--color-bg-input); }
 
-  /* ── Text ── */
-  .text-primary-c  { color: var(--color-text-primary); }
-  .text-secondary-c{ color: var(--color-text-secondary); }
-  .text-muted-c    { color: var(--color-text-muted); }
-  .text-link-c     { color: var(--color-text-link); }
 
-  /* ── Borders ── */
-  .border-c        { border-color: var(--color-border); }
-
-  /* ── Navbar ── */
-  .bg-nav          { background-color: var(--color-nav-bg); }
-  .border-nav      { border-color: var(--color-nav-border); }
-
-  /* ── Primary Button ── */
+  /* -- Primary Button -- */
   .btn-primary {
     background-color: var(--color-primary);
     color: var(--color-text-inverse);
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer inline-flex items-center gap-2;
+    cursor: pointer;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center gap-2;
   }
+
   .btn-primary:hover {
     background-color: var(--color-primary-hover);
     @apply shadow-md;
   }
+
   .btn-primary:active {
     @apply scale-95;
   }
 
-  /* ── Ghost Button ── */
+  /* -- Ghost Button -- */
   .btn-ghost {
     color: var(--color-text-secondary);
     background-color: transparent;
     border: 1px solid var(--color-border);
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer inline-flex items-center gap-2;
+    cursor: pointer;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center gap-2;
   }
+
   .btn-ghost:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-primary);
+    color: var(--color-primary);
+    border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
   }
 
-  /* ── Danger Button ── */
-  .btn-danger {
-    background-color: var(--color-error);
-    color: #fff;
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 cursor-pointer;
-  }
-
-  /* ── Tags / Badges ── */
+  /* -- Tags / Badges -- */
   .tag {
     background-color: var(--color-tag-bg);
     color: var(--color-tag-text);
-    @apply text-xs font-medium px-2.5 py-1 rounded-full cursor-pointer transition-all duration-150;
+    cursor: pointer;
+    @apply text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-150;
   }
+
   .tag:hover {
     @apply opacity-80;
   }
 
-  /* ── Card ── */
+  /* -- Card -- */
   .card {
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-border);
     box-shadow: var(--shadow-card);
     @apply rounded-xl transition-all duration-200;
   }
+
   .card:hover {
     box-shadow: var(--shadow-dropdown);
   }
 
-  /* ── Input Field ── */
+  /* -- Input Field -- */
   .input-field {
     background-color: var(--color-bg-input);
     border: 1px solid var(--color-border);
     color: var(--color-text-primary);
     @apply w-full px-4 py-2.5 rounded-lg text-sm outline-none transition-all duration-200;
   }
+
   .input-field:focus {
     border-color: var(--color-border-focus);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
   }
+
   .input-field::placeholder {
     color: var(--color-text-muted);
   }
 
-  /* ── Avatar Placeholder ── */
-  .avatar-placeholder {
-    background-color: var(--color-avatar-bg);
-    color: var(--color-avatar-text);
-    @apply flex items-center justify-center font-semibold rounded-full select-none;
-  }
-
-  /* ── Divider ── */
-  .divider {
-    border-color: var(--color-border);
-    @apply border-t w-full;
-  }
-
-  /* ── Like Button (accent) ── */
+  /* -- Like Button (accent) -- */
   .btn-like {
     color: var(--color-text-muted);
-    @apply flex items-center gap-1.5 text-sm transition-all duration-200 cursor-pointer;
+    cursor: pointer;
+    @apply flex items-center gap-1.5 text-sm transition-all duration-200;
   }
+
   .btn-like:hover,
   .btn-like.active {
     color: var(--color-accent);
   }
 
-  /* ── Dropdown Menu ── */
-  .dropdown {
-    background-color: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--shadow-dropdown);
-    @apply rounded-xl py-1 min-w-[160px] z-50;
+  /* -- Secondary Button -- */
+  .btn-secondary {
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    cursor: pointer;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center gap-2;
   }
-  .dropdown-item {
-    color: var(--color-nav-text);
-    @apply flex items-center gap-2 px-4 py-2.5 text-sm transition-all duration-150 cursor-pointer;
+
+  .btn-secondary:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
-  .dropdown-item:hover {
-    background-color: var(--color-bg-hover);
+
+  .btn-secondary:active {
+    @apply scale-95;
+  }
+
+  /* -- Danger Button -- */
+  .btn-danger {
+    background-color: var(--color-error);
+    color: var(--color-text-inverse);
+    cursor: pointer;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center gap-2;
+  }
+
+  .btn-danger:hover {
+    opacity: 0.9;
+  }
+
+  .btn-danger:active {
+    @apply scale-95;
+  }
+
+  /* -- Success Button -- */
+  .btn-success {
+    color: var(--color-success);
+    background-color: transparent;
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+    cursor: pointer;
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 inline-flex items-center gap-2;
+  }
+
+  .btn-success:hover {
+    background-color: var(--color-success);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-success:active {
+    @apply scale-95;
+  }
+
+  /* -- Error Surface (inline error banners) -- */
+  .error-surface {
+    background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
+    color: var(--color-error);
+    border: 1px solid color-mix(in srgb, var(--color-error) 25%, transparent);
+  }
+
+  /* -- Back / Nav Ghost Button -- */
+  .btn-nav {
+    color: var(--color-text-muted);
+    background-color: transparent;
+    @apply flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors cursor-pointer;
+  }
+
+  .btn-nav:hover {
+    color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  }
+
+  /* -- Success Outline Button (Edit actions) -- */
+  .btn-success-outline {
+    color: var(--color-success);
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+    background-color: transparent;
+    cursor: pointer;
+    @apply text-xs font-medium px-2.5 py-1 rounded-lg transition-all inline-flex items-center gap-1;
+  }
+
+  .btn-success-outline:hover {
+    background-color: color-mix(in srgb, var(--color-success) 8%, transparent);
+    border-color: var(--color-success);
+  }
+
+  /* -- Error Outline Button (Delete actions) -- */
+  .btn-error-outline {
+    color: var(--color-error);
+    border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+    background-color: transparent;
+    cursor: pointer;
+    @apply text-xs font-medium px-2.5 py-1 rounded-lg transition-all inline-flex items-center gap-1;
+  }
+
+  .btn-error-outline:hover {
+    background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
+    border-color: var(--color-error);
   }
 }
 
 /* ============================================================
-   🌀 GLOBAL BASE STYLES
+   ðŸ“ PROSE CONTENT - rich text post rendering
+   Applied to the .prose-content wrapper in PostDetails
+   ============================================================ */
+
+.prose-content {
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+.prose-content h1,
+.prose-content h2,
+.prose-content h3,
+.prose-content h4,
+.prose-content h5,
+.prose-content h6 {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.prose-content h1 {
+  font-size: 1.75rem;
+}
+
+.prose-content h2 {
+  font-size: 1.4rem;
+}
+
+.prose-content h3 {
+  font-size: 1.2rem;
+}
+
+.prose-content p {
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.prose-content a {
+  color: var(--color-text-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-content strong,
+.prose-content b {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.prose-content em,
+.prose-content i {
+  font-style: italic;
+}
+
+.prose-content ul,
+.prose-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.prose-content ul {
+  list-style-type: disc;
+}
+
+.prose-content ol {
+  list-style-type: decimal;
+}
+
+.prose-content li {
+  margin-bottom: 0.3rem;
+}
+
+.prose-content blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding: 0.6rem 1rem;
+  margin: 1.25rem 0;
+  background-color: var(--color-primary-light);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.prose-content code {
+  background-color: var(--color-bg-input);
+  color: var(--color-primary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border: 1px solid var(--color-border);
+}
+
+.prose-content pre {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.25rem 0;
+}
+
+.prose-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+}
+
+.prose-content img {
+  max-width: 100%;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+
+/* ============================================================
+   ðŸŒ€ GLOBAL BASE STYLES
    ============================================================ */
 
 @layer base {
@@ -281,7 +481,12 @@
     @apply antialiased font-sans transition-colors duration-300 min-h-screen;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: var(--color-text-primary);
     @apply font-bold leading-tight;
   }
@@ -292,13 +497,102 @@
   }
 
   /* Scrollbar */
-  ::-webkit-scrollbar        { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track  { background: var(--color-scrollbar); }
-  ::-webkit-scrollbar-thumb  { background: var(--color-scrollbar-thumb); border-radius: 99px; }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-scrollbar);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar-thumb);
+    border-radius: 99px;
+  }
 
   /* Text selection */
   ::selection {
     background-color: var(--color-primary-light);
     color: var(--color-primary);
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ============================================================
+   ðŸš€ LANDING PAGE STYLES
+   ============================================================ */
+
+.landing-orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+  animation: landing-orb-drift 12s ease-in-out infinite alternate;
+}
+
+@keyframes landing-orb-drift {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+
+  100% {
+    transform: translateY(-30px) scale(1.06);
+  }
+}
+
+/* -- Fade-up animation -- */
+.landing-fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.landing-fade-up.landing-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes landing-bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+/* -- Avatar rotating ring (animation - must stay CSS) -- */
+.about-dev-avatar-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px dashed var(--color-primary);
+  animation: rotate-ring 24s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes rotate-ring {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }

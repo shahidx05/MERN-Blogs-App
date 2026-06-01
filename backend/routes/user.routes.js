@@ -4,6 +4,7 @@ const authMiddleware = require('../middleware/auth.middleware')
 const upload = require("../middleware/upload.middleware");
 const userController = require('../controllers/user.controller')
 
+router.get('/search', userController.searchUsers)
 router.get('/bookmarks/:username', userController.getUserBookmarks)
 router.get('/:username', userController.getUserProfile)
 router.get('/:username/followers', userController.getUserFollowers)
